@@ -1,0 +1,4 @@
+ToolSet: w64 7.0 (local)@C:\msys32\mingw32
+Options: 
+
+Options:

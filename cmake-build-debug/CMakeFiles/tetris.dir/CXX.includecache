@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/rooke/Projects/tetris/main.cpp
+chrono
+-
+cstdlib
+-
+iostream
+-
+thread
+-
+vector
+-
+main.h
+C:/Users/rooke/Projects/tetris/main.h
+
+C:/Users/rooke/Projects/tetris/main.h
+
