@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <set>
 #include <thread>
 #include <vector>
 #include "main.h"
@@ -42,7 +43,7 @@ public:
             }
         }
 
-        rot = (rot + 1) % 4;
+        rot = (rot + 1) % ROTATIONS;
     }
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> getShape() {
@@ -78,24 +79,24 @@ public:
 class Board {
 private:
     bool board[BOARD_HEIGHT][BOARD_WIDTH] = {{false}};
+    int score = 0;
     // Keeps track of visited branches (prevents infinite recursion)
-    bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][4] = {{false}};
+    bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{false}};
     // Keeps track of which branches are valid: 0 means not yet determined, -1 means invalid, 1 means valid
-    int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][4] = {{0}};
+    int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{0}};
 
-    vector<array<int, 2>> getMoves(Piece *piece, int row, int col, int rot) {
-        resetMemo();
+    set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
         resetVisited();
         piece->setRot(rot);
 
         array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-        vector<array<int, 2>> moves;
+        set<array<int, 3>> moves;
 
         for (int r = 0; r < PIECE_SIZE; r++) {
             for (int c = 0; c < PIECE_SIZE; c++) {
                 if (shape[r][c]) {
-                    if (isMoveValid(piece, row - r, col - c, 0)) {
-                        moves.push_back({{row - r, col - c}});
+                    if (isMoveValid(piece, row - r, col - c, rot)) {
+                        moves.insert({{row - r, col - c, rot}});
                     }
                     resetVisited();
                     piece->setRot(rot);
@@ -110,7 +111,7 @@ private:
     void resetMemo() {
         for (int i = 0; i < BOARD_HEIGHT + PIECE_SIZE; i++) {
             for (int j = 0; j < BOARD_WIDTH + PIECE_SIZE; j++) {
-                for (int k = 0; k < 4; k++) {
+                for (int k = 0; k < ROTATIONS; k++) {
                     memo[i][j][k] = 0;
                 }
             }
@@ -120,27 +121,36 @@ private:
     void resetVisited() {
         for (int i = 0; i < BOARD_HEIGHT + PIECE_SIZE; i++) {
             for (int j = 0; j < BOARD_WIDTH + PIECE_SIZE; j++) {
-                for (int k = 0; k < 4; k++) {
+                for (int k = 0; k < ROTATIONS; k++) {
                     visited[i][j][k] = false;
                 }
             }
         }
     }
 
+    // Recursively checks if the piece would be able to reach the given position from the starting position (0, 3)
     bool isMoveValid(Piece *piece, int row, int col, int rot) {
-        if (row == 0 && col == 3) return true;
         // Already visited this branch, terminate
-        else if (visited[row + PIECE_SIZE][col + PIECE_SIZE][rot]) return false;
+        if (visited[row + PIECE_SIZE][col + PIECE_SIZE][rot]) return false;
         else if (memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] < 0) return false;
         else if (memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] > 0) return true;
 
         visited[row + PIECE_SIZE][col + PIECE_SIZE][rot] = true;
 
         array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-        vector<array<int, 2>> moves;
 
+        bool foundFirstBlock = false;
         for (int r = 0; r < PIECE_SIZE; r++) {
             for (int c = 0; c < PIECE_SIZE; c++) {
+                if (shape[r][c]) {
+                    // This is where the piece always starts in Tetris
+                    if (!foundFirstBlock && row + r == 0 && col + c == 3) {
+                        memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = 1;
+                        return true;
+                    }
+                    foundFirstBlock = true;
+                }
+
                 if (shape[r][c] && (
                         isOutOfBounds(row + r, col + c) ||
                         board[row + r][col + c]
@@ -160,8 +170,8 @@ private:
             return true;
         }
 
-        for (int n = 1; n < 4; n++) {
-            int newRot = (rot + n) % 4;
+        for (int n = 1; n < ROTATIONS; n++) {
+            int newRot = (rot + n) % ROTATIONS;
             piece->setRot(newRot);
             if (isMoveValid(piece, row, col, newRot)) {
                 memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = 1;
@@ -172,23 +182,59 @@ private:
         return false;
     }
 
+    void deleteRow(int row) {
+        for (int r = row; r > 0; r--) {
+            for (int c = 0; c < BOARD_WIDTH; c++) {
+                board[r][c] = board[r - 1][c];
+            }
+        }
+    }
+
+    bool isRowCompleted(int row) {
+        for (int c = 0; c < BOARD_WIDTH; c++) {
+            if (!board[row][c]) return false;
+        }
+
+        return true;
+    }
+
     static bool isOutOfBounds(int row, int col) {
         return row < 0 || row >= BOARD_HEIGHT ||
                col < 0 || col >= BOARD_WIDTH;
     }
 
 public:
-    vector<array<int, 2>> getMoves(Piece *piece) {
-        vector<array<int, 2>> moves;
+    // Returns a set of possible moves in format: (row, col, rot)
+    set<array<int, 3>> getMoves(Piece *piece) {
+        resetMemo();
+
+        set<array<int, 3>> moves;
 
         for (int r = 0; r < BOARD_HEIGHT; r++) {
             for (int c = 0; c < BOARD_WIDTH; c++) {
                 if (!board[r][c] && (r + 1 >= BOARD_HEIGHT || board[r + 1][c])) {
-                    // TODO: Check for all rotations of piece
-                    vector<array<int, 2>> partialMoves = getMoves(piece, r, c, 0);
-                    moves.insert(moves.end(), partialMoves.begin(), partialMoves.end());
+                    for (int rot = 0; rot < ROTATIONS; rot++) {
+                        set<array<int, 3>> partialMoves = getMoves(piece, r, c, rot);
+                        moves.insert(partialMoves.begin(), partialMoves.end());
+                    }
                 }
             }
+        }
+
+        return moves;
+    }
+
+    // Returns a set of possible moves in format: (pieceIndex, row, col, rot)
+    set<array<int, 4>> getMoves(array<Piece*, 7> pieces) {
+        set<array<int, 4>> moves;
+
+        int i = 0;
+        for (Piece* piece : pieces) {
+            set<array<int, 3>> partialMoves = getMoves(piece);
+            for (array<int, 3> move : partialMoves) {
+                moves.insert({i, move[0], move[1], move[2]});
+            }
+            i++;
         }
 
         return moves;
@@ -221,11 +267,19 @@ public:
         int row = piece->getRow();
         int col = piece->getCol();
 
+        int rowsCompleted = 0;
         for (int r = 0; r < PIECE_SIZE; r++) {
             for (int c = 0; c < PIECE_SIZE; c++) {
                 board[row + r][col + c] |= shape[r][c];
             }
+
+            if (isRowCompleted(row + r)) {
+                deleteRow(row + r);
+                rowsCompleted++;
+            }
         }
+
+        score += SCORES[rowsCompleted];
     }
 
     void render(Piece *piece) {
@@ -249,40 +303,73 @@ public:
 
 
 int main() {
+    srand(23477846);
+
     auto *board = new Board;
 
-    array<array<bool, PIECE_SIZE>, PIECE_SIZE> straightShape = {{
-                                                                        {false, false, false, false},
-                                                                        {true, true, true, true},
-                                                                        {false, false, false, false},
-                                                                        {false, false, false, false}
-                                                                }};
-    auto *piece = new Piece(straightShape);
+    auto *blankPiece = new Piece(BLANK_SHAPE);
+    auto *straightPiece = new Piece(STRAIGHT_SHAPE);
+    auto *lPiece = new Piece(L_SHAPE);
+    auto *flippedLPiece = new Piece(FLIPPED_L_SHAPE);
+    auto *zigZagPiece = new Piece(ZIG_ZAG_SHAPE);
+    auto *flippedZigZagPiece = new Piece(FLIPPED_ZIG_ZAG_SHAPE);
+    auto *squarePiece = new Piece(SQUARE_SHAPE);
+    auto *tPiece = new Piece(T_SHAPE);
 
-    board->render(piece);
+    array<Piece *, 7> pieces = {straightPiece,
+                                lPiece,
+                                flippedLPiece,
+                                zigZagPiece,
+                                flippedZigZagPiece,
+                                squarePiece,
+                                tPiece};
+
+    board->render(blankPiece);
 
     milliseconds start = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    for (int n = 0; n < 20; n++) {
-        vector<array<int, 2>> moves = board->getMoves(piece);
+    for (int n = 0; n < 10; n++) {
+        set<array<int, 4>> moves = board->getMoves(pieces);
         if (moves.empty()) break;
-        array<int, 2> move = moves[rand() % moves.size()];
-        piece->setPos(move[0], move[1]);
-        piece->setRot(0);
-        board->place(piece);
+        int selectedMove = rand() % moves.size();
+        int i = 0;
+        for (array<int, 4> move : moves) {
+            if (i++ == selectedMove) {
+                cout << move[0] << ", " << move[1] << ", " << move[2] << ", " << move[3] << "\n";
+                pieces[move[0]]->setPos(move[1], move[2]);
+                pieces[move[0]]->setRot(move[3]);
+                board->place(pieces[move[0]]);
+                array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = pieces[move[0]]->getShape();
+                for (int r = 0; r < PIECE_SIZE; r++) {
+                    for (int c = 0; c < PIECE_SIZE; c++) {
+                        cout << (shape[r][c] ? "X" : "-");
+                    }
+                    cout << "\n";
+                }
+                break;
+            }
+        }
+        board->render(blankPiece);
 
-//        board->render(piece);
-//
-//        this_thread::sleep_for(chrono::milliseconds(1000));
+        this_thread::sleep_for(chrono::milliseconds(1000));
     }
     milliseconds end = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     cout << (end.count() - start.count()) << "\n";
 
-    cout << "\n" << "\n" << "\n" << "MOVES:\n";
-    vector<array<int, 2>> moves = board->getMoves(piece);
-    for (array<int, 2> move : moves) {
-        piece->setPos(move[0], move[1]);
-        piece->setRot(0);
-        board->render(piece);
+    cout << "\n" << "\n" << "\n" << "Next moves:\n";
+    set<array<int, 4>> moves = board->getMoves(pieces);
+    for (array<int, 4> move : moves) {
+        cout << move[0] << ", " << move[1] << ", " << move[2] << ", " << move[3] << "\n";
+        pieces[move[0]]->setPos(move[1], move[2]);
+        pieces[move[0]]->setRot(move[3]);
+        array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = straightPiece->getShape();
+        for (int r = 0; r < PIECE_SIZE; r++) {
+            for (int c = 0; c < PIECE_SIZE; c++) {
+                cout << (shape[r][c] ? "X" : "-");
+            }
+            cout << "\n";
+        }
+        board->render(straightPiece);
+
     }
 
     return 0;
