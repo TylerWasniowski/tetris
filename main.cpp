@@ -293,7 +293,13 @@ public:
                                    c - col >= 0 && c - col < PIECE_SIZE &&
                                    shape[r - row][c - col];
 
-                cout << ((board[r][c] || renderPiece) ? "X" : "-");
+                if (renderPiece) {
+                    cout << "O";
+                } else if (board[r][c]) {
+                    cout << "X";
+                } else {
+                    cout << "-";
+                }
             }
             cout << "\n";
         }
@@ -345,12 +351,12 @@ int main() {
                     }
                     cout << "\n";
                 }
+                board->render(pieces[move[0]]);
                 break;
             }
         }
-        board->render(blankPiece);
 
-        this_thread::sleep_for(chrono::milliseconds(1000));
+//        this_thread::sleep_for(chrono::milliseconds(1000));
     }
     milliseconds end = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     cout << (end.count() - start.count()) << "\n";
