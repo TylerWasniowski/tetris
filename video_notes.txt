@@ -1,0 +1,18 @@
+Board 1 start location: 412, 190
+Line score 1 location: (412, 122) -> (503, 171)
+Next piece 1 location: (522, 122) -> (612, 171)
+
+Board 2 start location: 670, 190
+Line score 2 location: (670, 122) -> (760, 171)
+Next piece 2 location: (779, 122) -> (870, 171)
+
+Block size: 20
+
+Brightest black pixel: 40, 36, 34
+Darkest block pixel: 12, 126, 0
+
+Block spawn area: (3, 0) -> (7, 3)
+
+After line increases: 9-12 frames
+Line clear cooldown: 2-4 frames (4?)
+After new piece, look back: 1-8 frames (3?)

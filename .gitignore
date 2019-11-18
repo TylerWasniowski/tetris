@@ -36,3 +36,6 @@
 
 # Compiled folder
 cmake-build-debug
+
+# Tetris gameplay
+*.mp4
