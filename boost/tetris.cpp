@@ -67,9 +67,7 @@ namespace tetris {
 using namespace tetris;
 
 typedef vector<int> VectorInt;
-// typedef vector<vectorInt> vectorVectorInt;
 typedef vector<bool> VectorBool;
-// typedef vector<vectorBool> vectorVectorBool;
 
 class Piece {
  private:
@@ -433,22 +431,28 @@ class Board {
                            c - col >= 0 && c - col < PIECE_SIZE &&
                            shape[r - row][c - col];
 
-        // newBoard[r][c] = renderPiece || board[r][c];
-        // vectorBool vb(renderPiece || board[r][c]);
-        // vb.push_back(1);
-        // newBoard.push_back({ renderPiece || board[r][c] });
         vb.push_back(renderPiece || board[r][c]);
-        newBoard.push_back(vb);
       }
+      newBoard.push_back(vb);
+      vb.clear();
     }
 
     return newBoard;
+  }
+
+  int getValueOfVectorInts(vector<VectorInt> &vvi, int i, int j) {
+    return vvi[i][j];
+  }
+
+  bool getValueOfVectorBools(vector<VectorBool> &vvb, int i, int j) {
+    return vvb[i][j];
   }
 
   //wrap
   void printRend(const vector<VectorBool> &vvb) {
     for (int i = 0; i < vvb.size(); i++) {
       for (int j = 0; j < vvb[i].size(); j++) {
+        // cout << "vvb[" << i << "][" << j << "] = " << vvb[i][j] << " ";
         cout << vvb[i][j] << " ";
       }
        cout << endl;
@@ -540,9 +544,11 @@ BOOST_PYTHON_MODULE(tetris) {
       .def(vector_indexing_suite<vector<VectorInt>>());
 
   class_<Board>("Board")
-    .def("place", place)
-    .def("getMoves", getMoves)
-    .def("rend", &Board::rend)
-    .def("printRend", &Board::printRend)
-    .def("printMoves", &Board::printMoves);
+      .def("place", place)
+      .def("getMoves", getMoves)
+      .def("rend", &Board::rend)
+      .def("printRend", &Board::printRend)
+      .def("printMoves", &Board::printMoves)
+      .def("getValueOfVectorInts", &Board::getValueOfVectorInts)
+      .def("getValueOfVectorBools", &Board::getValueOfVectorBools);
 }
