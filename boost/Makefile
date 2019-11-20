@@ -6,11 +6,18 @@ BOOST_LIB = $(BOOST_INC)/stage/lib
 
 TARGET = tetris
 
-$(TARGET).so: $(TARGET).o
+boost:
+	g++ -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c -w $(TARGET).cpp
 	g++ -shared -Wall -Werror -Wl,--export-dynamic $(TARGET).o -L$(BOOST_LIB) -lboost_python36 -o $(TARGET).so
 
-$(TARGET).o: $(TARGET).cpp
-	g++ -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c -w $(TARGET).cpp
+# $(TARGET).so: $(TARGET).o
+# 	g++ -shared -Wall -Werror -Wl,--export-dynamic $(TARGET).o -L$(BOOST_LIB) -lboost_python36 -o $(TARGET).so
+
+# $(TARGET).o: $(TARGET).cpp
+# 	g++ -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c -w $(TARGET).cpp
+
+cpp:
+	g++ -o $(TARGET) $(TARGET).cpp
 
 clean:
 	rm -f $(TARGET).o $(TARGET).so

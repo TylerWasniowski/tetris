@@ -20,5 +20,7 @@ VOLUME /tetris-project/src
 WORKDIR /tetris-project/src
 
 # docker build -t tetris-project:latest .
-# docker run -t -i -v $PWD:/tetris-project/src tetris-project:latest
-# cd /tetris-project/boost_1_71_0 && ./b2 install && cd /tetris-project/src
+# docker run --name tetris-project -t -i -v $PWD:/tetris-project/src tetris-project:latest
+# docker start tetris-project
+# docker exec -it tetris-project bash
+# docker stop tetris-project
