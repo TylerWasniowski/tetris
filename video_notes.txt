@@ -14,5 +14,5 @@ Darkest block pixel: 12, 126, 0
 Block spawn area: (3, 0) -> (7, 3)
 
 After line increases: 9-12 frames
-Line clear cooldown: 2-4 frames (4?)
+Line clear cooldown: 2-4 frames (2?)
 After new piece, look back: 1-8 frames (3?)
