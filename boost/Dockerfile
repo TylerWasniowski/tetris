@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 RUN apt update && \
-apt install -y g++ make python3-dev wget vim && \
+apt install -y g++ make python3-dev python3-venv wget && \
 mkdir /tetris-project && \
 cd /tetris-project && \
 wget -q https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2 && \

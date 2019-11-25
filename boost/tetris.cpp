@@ -75,7 +75,7 @@ class Piece {
   int row;
   int col;
   int rot;
-  int shapeIndex;
+  int pieceIndex;
 
  public:
   explicit Piece(array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape)
@@ -89,8 +89,8 @@ class Piece {
     this->rot = 0;
   }
 
-  explicit Piece(int shapeIndex, int row, int col, int rot) {
-    this->shapeIndex = shapeIndex;
+  explicit Piece(int pieceIndex, int row, int col, int rot) {
+    this->pieceIndex = pieceIndex;
     this->row = row;
     this->col = col;
     this->rot = rot;
@@ -136,6 +136,7 @@ class Piece {
 
 class Board {
  private:
+  vector<VectorInt> currentMoves;
   array<Piece *, 7> pieces;
   bool board[BOARD_HEIGHT][BOARD_WIDTH] = {{false}};
   int score = 0;
@@ -317,24 +318,6 @@ class Board {
     return moves;
   }
 
-  // Returns true if piece can fit on board
-  bool isValid(Piece *piece) {
-    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-    int row = piece->getRow();
-    int col = piece->getCol();
-
-    for (int r = 0; r < PIECE_SIZE; r++) {
-      for (int c = 0; c < PIECE_SIZE; c++) {
-        if (shape[r][c] &&
-            (isOutOfBounds(row + r, col + c) || board[row + r][col + c])) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
   void place(Piece *piece) {
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
     int row = piece->getRow();
@@ -382,20 +365,25 @@ class Board {
 
   //wrap
   vector<VectorInt> getMoves() {
+    currentMoves.clear();
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> distribution(0, 6);
     int randomIndex = distribution(gen);
     auto *piece = pieces[randomIndex];
 
-    vector<VectorInt> moves;
+    // vector<VectorInt> moves;
     set<array<int, 3>> partialMoves = getMoves(piece);
 
     for (array<int, 3> move : partialMoves) {
-      moves.push_back({randomIndex, move[0], move[1], move[2]});
+      currentMoves.push_back({randomIndex, move[0], move[1], move[2]});
     }
 
-    return moves;
+    return currentMoves;
+  }
+
+  int getNumberOfMoves() {
+    return currentMoves.size();
   }
 
   //wrap
@@ -418,9 +406,9 @@ class Board {
   }
 
   //wrap
-  vector<VectorBool> rend(int shapeIndex, int row, int col, int rot) {
-    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = SHAPES[shapeIndex];
-    auto *piece = pieces[shapeIndex];
+  vector<VectorBool> rend(int pieceIndex, int row, int col, int rot) {
+    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = SHAPES[pieceIndex];
+    auto *piece = pieces[pieceIndex];
 
     vector<VectorBool> newBoard;
     VectorBool vb;
@@ -446,6 +434,49 @@ class Board {
 
   bool getValueOfVectorBools(vector<VectorBool> &vvb, int i, int j) {
     return vvb[i][j];
+  }
+
+  int getScore() {
+    return score;
+  }
+
+  void reset() {
+    resetMemo();
+    resetVisited();
+    score = 0;
+
+    for (int row = 0; row < BOARD_HEIGHT; row++) {
+      for (int col = 0; col < BOARD_WIDTH; col++) {
+        board[row][col] = false;
+      }
+    }
+  }
+
+  // Returns true if piece can fit on board
+  bool isValid(Piece *piece) {
+    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
+    int row = piece->getRow();
+    int col = piece->getCol();
+
+    for (int r = 0; r < PIECE_SIZE; r++) {
+      for (int c = 0; c < PIECE_SIZE; c++) {
+        if (shape[r][c] &&
+            (isOutOfBounds(row + r, col + c) || board[row + r][col + c])) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  // Returns true if piece can fit on board
+  bool isValid(int pieceIndex, int row, int col, int rot) {
+    auto *piece = pieces[pieceIndex];
+    piece->setRow(row);
+    piece->setCol(col);
+    piece->setRot(rot);
+    return isValid(piece);
   }
 
   //wrap
@@ -533,12 +564,14 @@ int main() {
 BOOST_PYTHON_MODULE(tetris) {
   using namespace boost::python;
 
-  void (Board::*place)(int shapeIndex, int row, int col, int rot) = &Board::place;
+  void (Board::*place)(int pieceIndex, int row, int col, int rot) = &Board::place;
 
   vector<VectorInt> (Board::*getMoves)() = &Board::getMoves;
 
+  bool (Board::*isValid)(int pieceIndex, int row, int col, int rot) = &Board::isValid;
+
   class_<vector<VectorBool>>("vector<VectorBool>")
-    .def(vector_indexing_suite<vector<VectorBool>>());
+      .def(vector_indexing_suite<vector<VectorBool>>());
 
   class_<vector<VectorInt>>("vector<VectorInt>")
       .def(vector_indexing_suite<vector<VectorInt>>());
@@ -550,5 +583,9 @@ BOOST_PYTHON_MODULE(tetris) {
       .def("printRend", &Board::printRend)
       .def("printMoves", &Board::printMoves)
       .def("getValueOfVectorInts", &Board::getValueOfVectorInts)
-      .def("getValueOfVectorBools", &Board::getValueOfVectorBools);
+      .def("getValueOfVectorBools", &Board::getValueOfVectorBools)
+      .def("getScore", &Board::getScore)
+      .def("reset", &Board::reset)
+      .def("isValid", isValid)
+      .def("getNumberOfMoves", &Board::getNumberOfMoves);
 }
