@@ -7,6 +7,7 @@
   * ./compile.sh
 * To install dependencies and run Python program:
   * cd /tetris-project/src/tetris/boost
+  * python3 -m venv env
   * source env/bin/activate
   * pip3 install -r requirements.txt
   * ./run.sh
