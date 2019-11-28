@@ -38,7 +38,7 @@ def train_hmm(observations, n=8, n_iter=350, restarts=1, verbose=False):
     best_model = None
     best_score = -math.inf
     for i in range(1, restarts + 1):
-        model = hmm.MultinomialHMM(n_components=n, n_iter=n_iter, tol=0.01, verbose=verbose)
+        model = hmm.MultinomialHMM(n_components=n, n_iter=n_iter, tol=0.1, verbose=verbose)
         model.fit(observations)
         score = model.score(observations)
         if score > best_score:
