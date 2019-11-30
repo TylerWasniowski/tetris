@@ -1,6 +1,7 @@
 import tetris
 import random
 import math
+from statistics import mean
 import numpy as np
 import pickle
 from tqdm import tqdm
@@ -47,11 +48,6 @@ class Tetris:
         reward = score - previous_score
         return reward
 
-    def best_action(self, state):
-        # Return index of movesArray that gives the max reward
-        action = 0
-        return action
-
     def reset(self):
         self.board.reset()
         self.boardArray = np.zeros(self.state_shape)
@@ -62,14 +58,16 @@ class Tetris:
 
 
 class DQN:
-    def __init__(self, state_shape, experience_size=200, discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=50):
+    def __init__(self, state_shape, experience_size, discount, epsilon, epsilon_min, epsilon_stop_episode):
         self.state_shape = state_shape
         self.experiences = []
         self.experience_size = experience_size
         self.discount = discount
         self.epsilon = epsilon
         self.epsilon_min = epsilon_min
-        self.epsilon_decay = (self.epsilon - self.epsilon_min) / (epsilon_stop_episode)
+        self.epsilon_stop_episode = epsilon_stop_episode
+        self.epsilon_decay = (
+            self.epsilon - self.epsilon_min) / (epsilon_stop_episode)
         self.model = self.build_model()
 
     def build_model(self):
@@ -84,12 +82,30 @@ class DQN:
     def add_experience(self, current_state, next_state, action, reward):
         self.experiences.append((current_state, next_state, action, reward))
 
+    def best_action(self, state):
+        # Return index of movesArray that gives the max reward
+        # if np.random.rand() <= self.epsilon:
+        #     return random.randrange(self.action_size)
+        state = np.expand_dims(state, axis=0)
+        act_values = self.model.predict(state)[0][0]
+        # print("act_values:\n", act_values)
+        # print("np.argmax(act_values):", np.argmax(act_values))
+        action = np.argmax(act_values)
+        # action = 0
+        return action
+        # return np.argmax(act_values[0])
+
+        # action = 0
+        # return action
+
     def train(self, batch_size=32, epochs=3):
+        # if len(self.experiences) >= batch_size:
         batch = random.sample(self.experiences, batch_size)
 
         for current_state, next_state, action, reward in batch:
             next_state = np.expand_dims(next_state, axis=0)
-            target = reward + self.discount * np.amax(self.model.predict(next_state)[0])
+            target = reward + self.discount * \
+                np.amax(self.model.predict(next_state)[0])
             # print("target: ", target)
             current_state = np.expand_dims(current_state, axis=0)
             target_f = self.model.predict(current_state)
@@ -164,14 +180,21 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
             tetris.current_state = tetris.next_state
             # print("current_state =\n", tetris.current_state)
             tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
+            # best_action = 0
 
             if tetris.board.getNumberOfMoves() > 0:
-                best_action = tetris.best_action(tetris.current_state)
+                best_action = dqn.best_action(tetris.current_state)
             else:
                 tetris.reset()
                 continue
 
+            if best_action >= np.size(tetris.movesArray, 0):
+                best_action = 0
+
+            # print("movesArray:\n", tetris.movesArray)
+
             action = tetris.movesArray[best_action]
+
             pieceIndex, row, col, rot = int(action[0]), int(
                 action[1]), int(action[2]), int(action[3])
             # print(f"pieceIndex: {pieceIndex}, row: {row}, col: {col}, rot: {rot}")
@@ -192,24 +215,32 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
             # print("previous_score = ", tetris.previous_score)
             # print("reward = ", reward)
             # print("score = ", tetris.score)
-            dqn.add_experience(tetris.current_state, tetris.next_state, action, reward)
+            dqn.add_experience(tetris.current_state,
+                               tetris.next_state, action, reward)
 
         scores.append(tetris.score)
 
         if episode % train_every == 0:
             dqn.train(batch_size=batch_size, epochs=epochs)
-    
+
     print("scores:\n", scores)
+    print(f"min(scores):", min(scores), "reached on game #",
+          np.argmin(scores) + 1, "/", episodes)
+    print(f"max(scores):", max(scores), "reached on game #",
+          np.argmax(scores) + 1, "/", episodes)
+    print(f"mean(scores):", mean(scores))
 
 
 def main():
     tetris = Tetris()
 
-    dqn = DQN(state_shape=tetris.state_shape, experience_size=100, discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=50)
+    dqn = DQN(state_shape=tetris.state_shape, experience_size=1000,
+              discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=750)
 
     collect_experiences(tetris, dqn)
 
-    train_model(tetris, dqn, batch_size=32, epochs=3, episodes=20, train_every=5)
+    train_model(tetris, dqn, batch_size=32,
+                epochs=3, episodes=50, train_every=5)
 
 
 if __name__ == "__main__":
