@@ -9,6 +9,8 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
+import tensorflow as tf
+from keras import backend as K
 
 
 class Tetris:
@@ -232,6 +234,12 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
 
 
 def main():
+    session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    print("Print:", session_gpu)
+
+
+    print("available gpus:", K.tensorflow_backend._get_available_gpus())
+
     tetris = Tetris()
 
     dqn = DQN(state_shape=tetris.state_shape, experience_size=1000,
