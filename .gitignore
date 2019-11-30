@@ -40,3 +40,6 @@ cmake-build-debug
 # Tetris gameplay
 *.mp4
 *__pycache__/
+
+# Compiled python files
+*.pyc
