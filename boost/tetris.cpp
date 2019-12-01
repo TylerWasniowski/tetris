@@ -71,7 +71,7 @@ typedef vector<bool> VectorBool;
 
 class Piece {
  private:
-  array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = {{false}};
+  array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape;
   int row;
   int col;
   int rot;
@@ -79,7 +79,7 @@ class Piece {
 
  public:
   explicit Piece(array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape)
-      : Piece(shape, 0, 3) {}
+      : Piece(shape, 0, 3) { }
 
   explicit Piece(array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape, int row,
                  int col) {
@@ -139,14 +139,13 @@ class Board {
   vector<VectorInt> currentMoves;
   array<Piece *, 7> pieces;
   bool board[BOARD_HEIGHT][BOARD_WIDTH] = {{false}};
+  //bool board[BOARD_HEIGHT][BOARD_WIDTH] = {false};
   int score = 0;
   // Keeps track of visited branches (prevents infinite recursion)
-  bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] =
-      {{false}};
+  bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{false}}};
   // Keeps track of which branches are valid: 0 means not yet determined, -1
   // means invalid, 1 means valid
-  int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {
-      {0}};
+  int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{0}}};
 
   set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
     resetVisited();
@@ -280,6 +279,12 @@ class Board {
     pieces = { straightPiece, lPiece, flippedLPiece, zigZagPiece,
         flippedZigZagPiece, squarePiece, tPiece
     };
+
+//    for (int r = 0; r < BOARD_HEIGHT; r++) {
+//      for (int c = 0; c < BOARD_WIDTH; c++) {
+//        board[r][c] = false;
+//      }
+//    }
   }
 
   // Returns a set of possible moves in format: (row, col, rot)
