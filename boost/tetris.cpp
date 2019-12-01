@@ -151,10 +151,14 @@ class Board {
       cout << "resetting visited\n";
     resetVisited();
       cout << "post resetting visited\n";
+      cout << "setting rot\n";
     piece->setRot(rot);
+      cout << "getting shape\n";
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-    set<array<int, 3>> moves;
+      cout << "making moves set\n";
+
+      set<array<int, 3>> moves;
 
     cout << "Finished setup for getmoves(piece, row, col, rot)\n";
 
