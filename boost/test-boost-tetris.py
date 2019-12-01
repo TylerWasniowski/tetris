@@ -126,8 +126,8 @@ def collect_experiences(tetris):
         tetris.current_state = tetris.next_state
         print("post current to next")
         state_str = ""
-        for r in len(tetris.current_state):
-            for c in len(tetris.current_state[r]):
+        for r in tetris.current_state.shape[0]:
+            for c in tetris.current_state.shape[1]:
                 if tetris.current_state[r][c] == 0:
                     state_str += "-"
                 else:
