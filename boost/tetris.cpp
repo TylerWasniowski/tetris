@@ -344,8 +344,8 @@ class Board {
     int rowsCompleted = 0;
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
-        // if (isOutOfBounds(row + r, col + c))
-        board[row + r][col + c] |= shape[r][c];
+        if (!isOutOfBounds(row + r, col + c))
+            board[row + r][col + c] |= shape[r][c];
       }
 
       if (isRowCompleted(row + r)) {
