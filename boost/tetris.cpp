@@ -289,6 +289,7 @@ class Board {
 
   // Returns a set of possible moves in format: (row, col, rot)
   set<array<int, 3>> getMoves(Piece *piece) {
+    cout << "get moves piece\n";
     resetMemo();
 
     set<array<int, 3>> moves;
