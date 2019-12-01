@@ -145,7 +145,7 @@ class Piece {
 class Board {
  private:
   vector<VectorInt> currentMoves;
-  Piece* pieces[7] = new Piece*[7];
+  Piece* pieces[7] = {};
   bool board[BOARD_HEIGHT][BOARD_WIDTH] = {{false}};
   // bool board[BOARD_HEIGHT][BOARD_WIDTH] = {false};
   int score = 0;
