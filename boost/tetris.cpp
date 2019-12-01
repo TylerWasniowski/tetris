@@ -297,8 +297,8 @@ class Board {
     auto *squarePiece = new Piece(SQUARE_SHAPE);
     auto *tPiece = new Piece(T_SHAPE);
 
-    this->pieces = {{straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
-              flippedZigZagPiece, squarePiece, tPiece}};
+    this->pieces = {straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
+              flippedZigZagPiece, squarePiece, tPiece};
 
     //    for (int r = 0; r < BOARD_HEIGHT; r++) {
     //      for (int c = 0; c < BOARD_WIDTH; c++) {
