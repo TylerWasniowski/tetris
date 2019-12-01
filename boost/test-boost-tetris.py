@@ -125,7 +125,14 @@ def collect_experiences(tetris):
         print("current to next")
         tetris.current_state = tetris.next_state
         print("post current to next")
-        print("current_state =\n", tetris.current_state)
+        state_str = ""
+        for r in tetris.current_state:
+            for c in tetris.current_state:
+                if tetris.current_state[r][c] == 0:
+                    state_str += "-"
+                else:
+                    state_str += "X"
+            state_str += "\n"
         print("getting moves array")
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
         print("post getting moves array")
