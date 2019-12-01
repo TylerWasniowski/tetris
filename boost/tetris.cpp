@@ -228,21 +228,27 @@ class Board {
     bool foundFirstBlock = false;
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
-        if (shape[r][c]) {
-          // This is where the piece always starts in Tetris
-          if (!foundFirstBlock && row + r == 0 && col + c == 3) {
-            memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = 1;
-            return true;
-          }
-          foundFirstBlock = true;
-        }
-
         if (shape[r][c] &&
             (isOutOfBounds(row + r, col + c) || board[row + r][col + c])) {
           memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = -1;
           return false;
         }
       }
+    }
+
+    for (int r = 0; r < PIECE_SIZE; r++) {
+        for (int c = 0; c < PIECE_SIZE; c++) {
+            if (shape[r][c]) {
+                // This is where the piece always starts in Tetris
+                if (row + r == 0 && col + c == 3) {
+                    memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = 1;
+                    return true;
+                } else {
+                    memo[row + PIECE_SIZE][col + PIECE_SIZE][rot] = -1;
+                    return false;
+                }
+            }
+        }
     }
 
     bool canAccess = isMoveValid(piece, row - 1, col, rot) ||
