@@ -1,13 +1,14 @@
 PYTHON_VERSION = 3.6m
-#PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
-PYTHON_INCLUDE =  /home/twasniowski/.conda/envs/tetris/include/python$(PYTHON_VERSION)
+PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
+# PYTHON_INCLUDE =  /home/twasniowski/.conda/envs/tetris/include/python$(PYTHON_VERSION)
 
-BOOST_INC = /home/twasniowski/tetris/boost/boost_1_71_0
+# BOOST_INC = /home/twasniowski/tetris/boost/boost_1_71_0
+BOOST_INC = /tetris-boost/boost_1_71_0
 BOOST_LIB = $(BOOST_INC)/stage/lib
 
 TARGET = tetris
 
-CXX = c++11
+CXX = c++17
 
 boost:
 	g++ -std=$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c -w $(TARGET).cpp
