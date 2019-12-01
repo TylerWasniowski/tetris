@@ -133,6 +133,7 @@ def collect_experiences(tetris):
                 else:
                     state_str += "X"
             state_str += "\n"
+        print(state_str)
         print("getting moves array")
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
         print("post getting moves array")
