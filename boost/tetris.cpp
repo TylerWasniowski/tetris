@@ -155,19 +155,19 @@ class Board {
   int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{0}}};
 
   set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
-      cout << "resetting visited\n";
+//      cout << "resetting visited\n";
     resetVisited();
-      cout << "post resetting visited\n";
-      cout << "setting rot\n";
+//      cout << "post resetting visited\n";
+//      cout << "setting rot\n";
     piece->setRot(rot);
-      cout << "getting shape\n";
+//      cout << "getting shape\n";
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-      cout << "making moves set\n";
+//      cout << "making moves set\n";
 
       set<array<int, 3>> moves;
 
-    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
+//    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
 
 
     for (int r = 0; r < PIECE_SIZE; r++) {
