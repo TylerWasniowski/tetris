@@ -156,6 +156,7 @@ def collect_experiences(tetris):
         # print("notGameOver: ", notGameOver)
 
         if notGameOver:
+            print("Performing: ", pieceIndex, row, col, rot, "(pieceIndex, row, col, rot)")
             tetris.board.place(pieceIndex, row, col, rot)
             render = tetris.board.rend(pieceIndex, row, col, rot)
             tetris.boardArray = tetris.getBoardArray(render)
