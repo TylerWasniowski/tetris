@@ -11,6 +11,7 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 import tensorflow as tf
 from keras import backend as K
+from keras.utils import multi_gpu_model
 
 
 class Tetris:
@@ -28,6 +29,7 @@ class Tetris:
         self.next_state = self.getBoardArray(self.board.rend(0, 0, 0, 0))
         self.numberOfMoves = 0
         self.movesArray = np.zeros((0, 0))
+        self.movesPlayed = 0
 
     def getMovesArray(self, moves):
         self.numberOfMoves = self.board.getNumberOfMoves()
@@ -57,12 +59,13 @@ class Tetris:
         self.next_state = self.getBoardArray(self.board.rend(0, 0, 0, 0))
         self.previous_score = 0
         self.score = 0
+        self.movesPlayed = 0
 
 
 class DQN:
     def __init__(self, state_shape, experience_size, discount, epsilon, epsilon_min, epsilon_stop_episode):
         self.state_shape = state_shape
-        self.experiences = []
+        self.experiences = deque(maxlen=experience_size)
         self.experience_size = experience_size
         self.discount = discount
         self.epsilon = epsilon
@@ -71,6 +74,8 @@ class DQN:
         self.epsilon_decay = (
             self.epsilon - self.epsilon_min) / (epsilon_stop_episode)
         self.model = self.build_model()
+        self.parallel_model = multi_gpu_model(self.model, gpus=2)
+        self.parallel_model.compile(loss="mse", optimizer="adam")
 
     def build_model(self):
         model = Sequential()
@@ -114,7 +119,8 @@ class DQN:
             # print("target_f: ", target_f)
             target_f[0][0] = target
             # target_f[0][action] = target
-            self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
+            # self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
+            self.parallel_model.fit(current_state, target_f, epochs=epochs, verbose=0)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon -= self.epsilon_decay
@@ -126,6 +132,15 @@ class DQN:
     def readExperiencesFromFile(self, filename):
         with open(f"{filename}", "rb") as file:
             self.experiences = pickle.load(file)
+
+
+def print_stats(array, label, episodes):
+    print(f"{label}:\n", array)
+    print(f"min({label}):", min(array), "reached on game #",
+          np.argmin(array) + 1, "/", episodes)
+    print(f"max({label}):", max(array), "reached on game #",
+          np.argmax(array) + 1, "/", episodes)
+    print(f"mean({label}):", mean(array))
 
 
 def collect_experiences(tetris, dqn):
@@ -154,6 +169,7 @@ def collect_experiences(tetris, dqn):
 
         if notGameOver:
             tetris.board.place(pieceIndex, row, col, rot)
+            tetris.movesPlayed += 1
             render = tetris.board.rend(pieceIndex, row, col, rot)
             tetris.boardArray = tetris.getBoardArray(render)
             tetris.next_state = tetris.boardArray
@@ -174,6 +190,7 @@ def collect_experiences(tetris, dqn):
 
 def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
     scores = []
+    movesPlayed = []
 
     for episode in tqdm(range(episodes)):
         tetris.current_state = tetris.reset()
@@ -205,6 +222,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
             # print("notGameOver: ", notGameOver)
 
             tetris.board.place(pieceIndex, row, col, rot)
+            tetris.movesPlayed += 1
             render = tetris.board.rend(pieceIndex, row, col, rot)
             tetris.boardArray = tetris.getBoardArray(render)
             tetris.next_state = tetris.boardArray
@@ -221,29 +239,25 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
                                tetris.next_state, action, reward)
 
         scores.append(tetris.score)
+        movesPlayed.append(tetris.movesPlayed)
 
         if episode % train_every == 0:
             dqn.train(batch_size=batch_size, epochs=epochs)
 
-    print("scores:\n", scores)
-    print(f"min(scores):", min(scores), "reached on game #",
-          np.argmin(scores) + 1, "/", episodes)
-    print(f"max(scores):", max(scores), "reached on game #",
-          np.argmax(scores) + 1, "/", episodes)
-    print(f"mean(scores):", mean(scores))
+    print_stats(scores, "scores", episodes)
+    print_stats(movesPlayed, "movesPlayed", episodes)
 
 
 def main():
     session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     print("Print:", session_gpu)
 
-
     print("available gpus:", K.tensorflow_backend._get_available_gpus())
 
     tetris = Tetris()
 
-    dqn = DQN(state_shape=tetris.state_shape, experience_size=1000,
-              discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=750)
+    dqn = DQN(state_shape=tetris.state_shape, experience_size=500,
+              discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=350)
 
     collect_experiences(tetris, dqn)
 
