@@ -160,7 +160,9 @@ def collect_experiences(tetris):
             tetris.board.place(pieceIndex, row, col, rot)
             print("Rendering: ", pieceIndex, row, col, rot, "(pieceIndex, row, col, rot)")
             render = tetris.board.rend(pieceIndex, row, col, rot)
+            print("Getting board array")
             tetris.boardArray = tetris.getBoardArray(render)
+            print("Post getting board array")
             tetris.next_state = tetris.boardArray
 
             tetris.previous_score = tetris.score
