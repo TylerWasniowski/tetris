@@ -397,6 +397,7 @@ class Board {
     mt19937 gen(rd());
     uniform_int_distribution<> distribution(0, 6);
     int randomIndex = distribution(gen);
+    cout << "piece chosen: " << randomIndex << "\n";
     auto *piece = pieces[randomIndex];
 
     // vector<VectorInt> moves;
