@@ -126,7 +126,9 @@ def collect_experiences(tetris):
         tetris.current_state = tetris.next_state
         print("post current to next")
         # print("current_state =\n", tetris.current_state)
+        print("getting moves array")
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
+        print("post getting moves array")
 
         if tetris.board.getNumberOfMoves() > 0:
             rowIndex = random.randint(0, tetris.board.getNumberOfMoves() - 1)
