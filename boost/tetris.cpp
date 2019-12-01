@@ -71,7 +71,7 @@ typedef vector<bool> VectorBool;
 
 class Piece {
  private:
-  array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape;
+  array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = {{false}};
   int row;
   int col;
   int rot;
