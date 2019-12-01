@@ -13,7 +13,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend as K
 from tensorflow.keras.utils import multi_gpu_model
 
-
+print(tf.config.experimental.list_physical_devices('GPU'))
 mirrored_strategy = tf.distribute.MirroredStrategy()
 
 with mirrored_strategy.scope():
