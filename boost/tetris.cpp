@@ -148,7 +148,9 @@ class Board {
   int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{0}}};
 
   set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
+      cout << "resetting visited\n";
     resetVisited();
+      cout << "post resetting visited\n";
     piece->setRot(rot);
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
@@ -157,10 +159,13 @@ class Board {
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
         if (shape[r][c]) {
-          if (isMoveValid(piece, row - r, col - c, rot)) {
+            cout << "checking move valid\n";
+            if (isMoveValid(piece, row - r, col - c, rot)) {
             moves.insert({{row - r, col - c, rot}});
           }
-          resetVisited();
+            cout << "post checking move valid\n";
+
+            resetVisited();
           piece->setRot(rot);
         }
       }
@@ -305,6 +310,7 @@ class Board {
       }
     }
 
+    cout << "post moves piece\n";
     return moves;
   }
 
