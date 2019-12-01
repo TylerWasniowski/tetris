@@ -288,23 +288,14 @@ class Board {
 
  public:
   Board() {
-    auto *blankPiece = new Piece(BLANK_SHAPE);
-    auto *straightPiece = new Piece(STRAIGHT_SHAPE);
-    auto *lPiece = new Piece(L_SHAPE);
-    auto *flippedLPiece = new Piece(FLIPPED_L_SHAPE);
-    auto *zigZagPiece = new Piece(ZIG_ZAG_SHAPE);
-    auto *flippedZigZagPiece = new Piece(FLIPPED_ZIG_ZAG_SHAPE);
-    auto *squarePiece = new Piece(SQUARE_SHAPE);
-    auto *tPiece = new Piece(T_SHAPE);
-
-    this->pieces = {straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
-              flippedZigZagPiece, squarePiece, tPiece};
-
-    //    for (int r = 0; r < BOARD_HEIGHT; r++) {
-    //      for (int c = 0; c < BOARD_WIDTH; c++) {
-    //        board[r][c] = false;
-    //      }
-    //    }
+    int i = 0;
+    pieces[i++] = new Piece(STRAIGHT_SHAPE);
+    pieces[i++] = new Piece(L_SHAPE);
+    pieces[i++] = new Piece(FLIPPED_L_SHAPE);
+    pieces[i++] = new Piece(ZIG_ZAG_SHAPE);
+    pieces[i++] = new Piece(FLIPPED_ZIG_ZAG_SHAPE);
+    pieces[i++] = new Piece(SQUARE_SHAPE);
+    pieces[i++] = new Piece(T_SHAPE);
   }
 
   // Returns a set of possible moves in format: (row, col, rot)
