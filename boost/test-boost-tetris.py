@@ -158,6 +158,7 @@ def collect_experiences(tetris):
         if notGameOver:
             print("Performing: ", pieceIndex, row, col, rot, "(pieceIndex, row, col, rot)")
             tetris.board.place(pieceIndex, row, col, rot)
+            print("Rendering: ", pieceIndex, row, col, rot, "(pieceIndex, row, col, rot)")
             render = tetris.board.rend(pieceIndex, row, col, rot)
             tetris.boardArray = tetris.getBoardArray(render)
             tetris.next_state = tetris.boardArray
