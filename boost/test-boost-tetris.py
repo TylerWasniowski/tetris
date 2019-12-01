@@ -122,6 +122,7 @@ def collect_experiences(tetris):
     # These experiences are then used to train the DQN.
 
     for i in range(1000):
+        print("current to next")
         tetris.current_state = tetris.next_state
         # print("current_state =\n", tetris.current_state)
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
@@ -132,12 +133,15 @@ def collect_experiences(tetris):
             tetris.reset()
             continue
 
+        print("selecting action")
         action = tetris.movesArray[rowIndex]
         pieceIndex, row, col, rot = int(action[0]), int(
             action[1]), int(action[2]), int(action[3])
         # print(f"pieceIndex: {pieceIndex}, row: {row}, col: {col}, rot: {rot}")
 
+        print("checking is valid")
         notGameOver = tetris.board.isValid(pieceIndex, row, col, rot)
+        print("post is valid")
         # print("notGameOver: ", notGameOver)
 
         if notGameOver:
