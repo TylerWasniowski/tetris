@@ -3,7 +3,7 @@ import random
 # import math
 import numpy as np
 # import pickle
-from tqdm import tqdm
+# from tqdm import tqdm
 # from collections import deque
 # from keras.models import Sequential
 # from keras.layers import Dense
@@ -115,7 +115,7 @@ def collect_experiences(tetris):
     # (current_state, next_state, action, reward)
     # These experiences are then used to train the DQN.
 
-    for i in tqdm(range(100)):
+    for i in range(1000):
         tetris.current_state = tetris.next_state
         # print("current_state =\n", tetris.current_state)
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
