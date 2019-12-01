@@ -104,16 +104,16 @@ class Piece {
       for (int c = r; c < rowInverse; c++) {
         int colInverse = PIECE_SIZE - c - 1;
 
-          cout << "r: " <<  r <<  ", c: " << c << "rot: " << rot << "\n";
+//          cout << "r: " <<  r <<  ", c: " << c << "rot: " << rot << "\n";
         int temp = shape[r][c];
-        cout << "1\n";
-          shape[r][c] = shape[c][rowInverse];        cout << "2\n";
+//        cout << "1\n";
+          shape[r][c] = shape[c][rowInverse];        //cout << "2\n";
 
-          shape[c][rowInverse] = shape[rowInverse][colInverse];        cout << "3\n";
+          shape[c][rowInverse] = shape[rowInverse][colInverse];       // cout << "3\n";
 
-          shape[rowInverse][colInverse] = shape[colInverse][r];        cout << "4\n";
+          shape[rowInverse][colInverse] = shape[colInverse][r];      //  cout << "4\n";
 
-          shape[colInverse][r] = temp;        cout << "5\n";
+          shape[colInverse][r] = temp;      //  cout << "5\n";
 
       }
     }
