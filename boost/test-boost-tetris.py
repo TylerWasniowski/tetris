@@ -12,6 +12,7 @@ import numpy as np
 
 class Tetris:
     def __init__(self):
+        print("init")
         self.score = 0
         self.previous_score = 0
         self.move_columns = 4
@@ -27,6 +28,7 @@ class Tetris:
         self.movesArray = np.zeros((0, 0))
 
     def getMovesArray(self, moves):
+        print("Get moves array")
         self.numberOfMoves = self.board.getNumberOfMoves()
         self.movesArray = np.zeros((self.numberOfMoves, self.move_columns))
 
@@ -37,6 +39,7 @@ class Tetris:
         return self.movesArray
 
     def getBoardArray(self, rend):
+        print("get board array")
         for i in range(self.board_height):
             for j in range(self.board_width):
                 self.boardArray[i, j] = self.board.getValueOfVectorBools(
@@ -44,15 +47,18 @@ class Tetris:
         return self.boardArray
 
     def getReward(self, score, previous_score):
+        print("get reward")
         reward = score - previous_score
         return reward
 
     def best_action(self, state):
+        print("best_action")
         # Return index of movesArray that gives the max reward
         action = 0
         return action
 
     def reset(self):
+        print("reset")
         self.board.reset()
         self.boardArray = np.zeros(self.state_shape)
         self.current_state = self.getBoardArray(self.board.rend(0, 0, 0, 0))
