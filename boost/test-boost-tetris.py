@@ -124,6 +124,7 @@ def collect_experiences(tetris):
     for i in range(1000):
         print("current to next")
         tetris.current_state = tetris.next_state
+        print("post current to next")
         # print("current_state =\n", tetris.current_state)
         tetris.movesArray = tetris.getMovesArray(tetris.board.getMoves())
 
@@ -168,6 +169,8 @@ def collect_experiences(tetris):
             #                    tetris.next_state, action, reward)
         else:
             tetris.reset()
+
+        print()
 
 
 # def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
