@@ -9,59 +9,59 @@
 using namespace std;
 
 namespace tetris {
-  const int BOARD_WIDTH = 10;
-  const int BOARD_HEIGHT = 20;
-  const int PIECE_SIZE = 4;
-  const int ROTATIONS = 4;
-  const int NUM_SHAPES = 8;
+const int BOARD_WIDTH = 10;
+const int BOARD_HEIGHT = 20;
+const int PIECE_SIZE = 4;
+const int ROTATIONS = 4;
+const int NUM_SHAPES = 8;
 
-  // Scores for 1, 2, ..., n line clears with a single placement
-  const array<int, PIECE_SIZE> SCORES = {{40, 100, 300, 1200}};
+// Scores for 1, 2, ..., n line clears with a single placement
+const array<int, PIECE_SIZE> SCORES = {{40, 100, 300, 1200}};
 
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> BLANK_SHAPE = {
-      {{false, false, false, false},
-      {false, false, false, false},
-      {false, false, false, false},
-      {false, false, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> STRAIGHT_SHAPE = {
-      {{false, false, false, false},
-      {true, true, true, true},
-      {false, false, false, false},
-      {false, false, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> L_SHAPE = {
-      {{false, false, false, false},
-      {false, true, true, false},
-      {false, true, false, false},
-      {false, true, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> FLIPPED_L_SHAPE = {
-      {{false, false, false, false},
-      {false, true, true, false},
-      {false, false, true, false},
-      {false, false, true, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> ZIG_ZAG_SHAPE = {
-      {{false, false, true, false},
-      {false, true, true, false},
-      {false, true, false, false},
-      {false, false, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> FLIPPED_ZIG_ZAG_SHAPE = {
-      {{false, true, false, false},
-      {false, true, true, false},
-      {false, false, true, false},
-      {false, false, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> SQUARE_SHAPE = {
-      {{false, false, false, false},
-      {false, true, true, false},
-      {false, true, true, false},
-      {false, false, false, false}}};
-  const array<array<bool, PIECE_SIZE>, PIECE_SIZE> T_SHAPE = {
-      {{false, false, false, false},
-      {true, true, true, false},
-      {false, true, false, false},
-      {false, false, false, false}}};
-    
-  const array<array<array<bool, PIECE_SIZE>, PIECE_SIZE>, NUM_SHAPES> SHAPES = {
-    BLANK_SHAPE, STRAIGHT_SHAPE, L_SHAPE, FLIPPED_L_SHAPE, ZIG_ZAG_SHAPE, FLIPPED_L_SHAPE, SQUARE_SHAPE, T_SHAPE
-  };
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> BLANK_SHAPE = {
+    {{false, false, false, false},
+     {false, false, false, false},
+     {false, false, false, false},
+     {false, false, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> STRAIGHT_SHAPE = {
+    {{false, false, false, false},
+     {true, true, true, true},
+     {false, false, false, false},
+     {false, false, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> L_SHAPE = {
+    {{false, false, false, false},
+     {false, true, true, false},
+     {false, true, false, false},
+     {false, true, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> FLIPPED_L_SHAPE = {
+    {{false, false, false, false},
+     {false, true, true, false},
+     {false, false, true, false},
+     {false, false, true, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> ZIG_ZAG_SHAPE = {
+    {{false, false, true, false},
+     {false, true, true, false},
+     {false, true, false, false},
+     {false, false, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> FLIPPED_ZIG_ZAG_SHAPE = {
+    {{false, true, false, false},
+     {false, true, true, false},
+     {false, false, true, false},
+     {false, false, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> SQUARE_SHAPE = {
+    {{false, false, false, false},
+     {false, true, true, false},
+     {false, true, true, false},
+     {false, false, false, false}}};
+const array<array<bool, PIECE_SIZE>, PIECE_SIZE> T_SHAPE = {
+    {{false, false, false, false},
+     {true, true, true, false},
+     {false, true, false, false},
+     {false, false, false, false}}};
+
+const array<array<array<bool, PIECE_SIZE>, PIECE_SIZE>, NUM_SHAPES> SHAPES = {
+    BLANK_SHAPE,   STRAIGHT_SHAPE,        L_SHAPE,      FLIPPED_L_SHAPE,
+    ZIG_ZAG_SHAPE, FLIPPED_ZIG_ZAG_SHAPE, SQUARE_SHAPE, T_SHAPE};
 }
 
 using namespace tetris;
@@ -79,7 +79,7 @@ class Piece {
 
  public:
   explicit Piece(array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape)
-      : Piece(shape, 0, 3) { }
+      : Piece(shape, 0, 3) {}
 
   explicit Piece(array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape, int row,
                  int col) {
@@ -104,17 +104,18 @@ class Piece {
       for (int c = r; c < rowInverse; c++) {
         int colInverse = PIECE_SIZE - c - 1;
 
-//          cout << "r: " <<  r <<  ", c: " << c << "rot: " << rot << "\n";
+        //          cout << "r: " <<  r <<  ", c: " << c << "rot: " << rot <<
+        //          "\n";
         int temp = shape[r][c];
-//        cout << "1\n";
-          shape[r][c] = shape[c][rowInverse];        //cout << "2\n";
+        //        cout << "1\n";
+        shape[r][c] = shape[c][rowInverse];  // cout << "2\n";
 
-          shape[c][rowInverse] = shape[rowInverse][colInverse];       // cout << "3\n";
+        shape[c][rowInverse] = shape[rowInverse][colInverse];  // cout << "3\n";
 
-          shape[rowInverse][colInverse] = shape[colInverse][r];      //  cout << "4\n";
+        shape[rowInverse][colInverse] =
+            shape[colInverse][r];  //  cout << "4\n";
 
-          shape[colInverse][r] = temp;      //  cout << "5\n";
-
+        shape[colInverse][r] = temp;  //  cout << "5\n";
       }
     }
 
@@ -146,40 +147,41 @@ class Board {
   vector<VectorInt> currentMoves;
   array<Piece *, 7> pieces;
   bool board[BOARD_HEIGHT][BOARD_WIDTH] = {{false}};
-  //bool board[BOARD_HEIGHT][BOARD_WIDTH] = {false};
+  // bool board[BOARD_HEIGHT][BOARD_WIDTH] = {false};
   int score = 0;
   // Keeps track of visited branches (prevents infinite recursion)
-  bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{false}}};
+  bool visited[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] =
+      {{false}};
   // Keeps track of which branches are valid: 0 means not yet determined, -1
   // means invalid, 1 means valid
-  int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {{{0}}};
+  int memo[BOARD_HEIGHT + PIECE_SIZE][BOARD_WIDTH + PIECE_SIZE][ROTATIONS] = {
+      {0}};
 
   set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
-//      cout << "resetting visited\n";
+    //      cout << "resetting visited\n";
     resetVisited();
-//      cout << "post resetting visited\n";
-//      cout << "setting rot\n";
+    //      cout << "post resetting visited\n";
+    //      cout << "setting rot\n";
     piece->setRot(rot);
-//      cout << "getting shape\n";
+    //      cout << "getting shape\n";
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-//      cout << "making moves set\n";
+    //      cout << "making moves set\n";
 
-      set<array<int, 3>> moves;
+    set<array<int, 3>> moves;
 
-//    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
-
+    //    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
 
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
         if (shape[r][c]) {
-//            cout << "checking move valid\n";
-            if (isMoveValid(piece, row - r, col - c, rot)) {
+          //            cout << "checking move valid\n";
+          if (isMoveValid(piece, row - r, col - c, rot)) {
             moves.insert({{row - r, col - c, rot}});
           }
-//            cout << "post checking move valid\n";
+          //            cout << "post checking move valid\n";
 
-            resetVisited();
+          resetVisited();
           piece->setRot(rot);
         }
       }
@@ -295,20 +297,19 @@ class Board {
     auto *squarePiece = new Piece(SQUARE_SHAPE);
     auto *tPiece = new Piece(T_SHAPE);
 
-    pieces = { straightPiece, lPiece, flippedLPiece, zigZagPiece,
-        flippedZigZagPiece, squarePiece, tPiece
-    };
+    pieces = {straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
+              flippedZigZagPiece, squarePiece, tPiece};
 
-//    for (int r = 0; r < BOARD_HEIGHT; r++) {
-//      for (int c = 0; c < BOARD_WIDTH; c++) {
-//        board[r][c] = false;
-//      }
-//    }
+    //    for (int r = 0; r < BOARD_HEIGHT; r++) {
+    //      for (int c = 0; c < BOARD_WIDTH; c++) {
+    //        board[r][c] = false;
+    //      }
+    //    }
   }
 
   // Returns a set of possible moves in format: (row, col, rot)
   set<array<int, 3>> getMoves(Piece *piece) {
-    cout << "get moves piece\n";
+    // cout << "get moves piece\n";
     resetMemo();
 
     set<array<int, 3>> moves;
@@ -324,7 +325,7 @@ class Board {
       }
     }
 
-    cout << "post moves piece\n";
+    // cout << "post moves piece\n";
     return moves;
   }
 
@@ -389,7 +390,7 @@ class Board {
     cout << endl;
   }
 
-  //wrap
+  // wrap
   vector<VectorInt> getMoves() {
     currentMoves.clear();
     random_device rd;
@@ -408,11 +409,9 @@ class Board {
     return currentMoves;
   }
 
-  int getNumberOfMoves() {
-    return currentMoves.size();
-  }
+  int getNumberOfMoves() { return currentMoves.size(); }
 
-  //wrap
+  // wrap
   void printMoves(const vector<VectorInt> &vvi) {
     for (int i = 0; i < vvi.size(); i++) {
       for (int j = 0; j < vvi[i].size(); j++) {
@@ -422,7 +421,7 @@ class Board {
     }
   }
 
-  //wrap
+  // wrap
   void place(int pieceIndex, int row, int col, int rot) {
     auto *piece = pieces[pieceIndex];
     piece->setRow(row);
@@ -431,10 +430,11 @@ class Board {
     place(piece);
   }
 
-  //wrap
+  // wrap
   vector<VectorBool> rend(int pieceIndex, int row, int col, int rot) {
-    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = SHAPES[pieceIndex];
     auto *piece = pieces[pieceIndex];
+    piece->setRot(rot);
+    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
 
     vector<VectorBool> newBoard;
     VectorBool vb;
@@ -462,9 +462,7 @@ class Board {
     return vvb[i][j];
   }
 
-  int getScore() {
-    return score;
-  }
+  int getScore() { return score; }
 
   void reset() {
     resetMemo();
@@ -505,14 +503,14 @@ class Board {
     return isValid(piece);
   }
 
-  //wrap
+  // wrap
   void printRend(const vector<VectorBool> &vvb) {
     for (int i = 0; i < vvb.size(); i++) {
       for (int j = 0; j < vvb[i].size(); j++) {
         // cout << "vvb[" << i << "][" << j << "] = " << vvb[i][j] << " ";
         cout << vvb[i][j] << " ";
       }
-       cout << endl;
+      cout << endl;
     }
   }
 };
@@ -531,9 +529,8 @@ int main() {
   auto *tPiece = new Piece(T_SHAPE);
 
   array<Piece *, 7> pieces = {
-      straightPiece, lPiece, flippedLPiece, zigZagPiece,
-      flippedZigZagPiece, squarePiece, tPiece
-  };
+      straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
+      flippedZigZagPiece, squarePiece, tPiece};
 
   board->render(blankPiece);
 
@@ -590,11 +587,13 @@ int main() {
 BOOST_PYTHON_MODULE(tetris) {
   using namespace boost::python;
 
-  void (Board::*place)(int pieceIndex, int row, int col, int rot) = &Board::place;
+  void (Board::*place)(int pieceIndex, int row, int col, int rot) =
+      &Board::place;
 
   vector<VectorInt> (Board::*getMoves)() = &Board::getMoves;
 
-  bool (Board::*isValid)(int pieceIndex, int row, int col, int rot) = &Board::isValid;
+  bool (Board::*isValid)(int pieceIndex, int row, int col, int rot) =
+      &Board::isValid;
 
   class_<vector<VectorBool>>("vector<VectorBool>")
       .def(vector_indexing_suite<vector<VectorBool>>());
