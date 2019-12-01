@@ -104,18 +104,15 @@ class Piece {
       for (int c = r; c < rowInverse; c++) {
         int colInverse = PIECE_SIZE - c - 1;
 
-        //          cout << "r: " <<  r <<  ", c: " << c << "rot: " << rot <<
-        //          "\n";
         int temp = shape[r][c];
-        //        cout << "1\n";
-        shape[r][c] = shape[c][rowInverse];  // cout << "2\n";
+        shape[r][c] = shape[c][rowInverse];
 
-        shape[c][rowInverse] = shape[rowInverse][colInverse];  // cout << "3\n";
+        shape[c][rowInverse] = shape[rowInverse][colInverse];
 
         shape[rowInverse][colInverse] =
-            shape[colInverse][r];  //  cout << "4\n";
+            shape[colInverse][r];
 
-        shape[colInverse][r] = temp;  //  cout << "5\n";
+        shape[colInverse][r] = temp;
       }
     }
 
@@ -158,28 +155,19 @@ class Board {
       {0}};
 
   set<array<int, 3>> getMoves(Piece *piece, int row, int col, int rot) {
-    //      cout << "resetting visited\n";
     resetVisited();
-    //      cout << "post resetting visited\n";
-    //      cout << "setting rot\n";
     piece->setRot(rot);
-    //      cout << "getting shape\n";
 
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
-    //      cout << "making moves set\n";
 
     set<array<int, 3>> moves;
-
-    //    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
 
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
         if (shape[r][c]) {
-          //            cout << "checking move valid\n";
           if (isMoveValid(piece, row - r, col - c, rot)) {
             moves.insert({{row - r, col - c, rot}});
           }
-          //            cout << "post checking move valid\n";
 
           resetVisited();
           piece->setRot(rot);
@@ -304,7 +292,6 @@ class Board {
 
   // Returns a set of possible moves in format: (row, col, rot)
   set<array<int, 3>> getMoves(Piece *piece) {
-    // cout << "get moves piece\n";
     resetMemo();
 
     set<array<int, 3>> moves;
@@ -320,7 +307,6 @@ class Board {
       }
     }
 
-    // cout << "post moves piece\n";
     return moves;
   }
 
@@ -392,7 +378,6 @@ class Board {
     mt19937 gen(rd());
     uniform_int_distribution<> distribution(0, 6);
     int randomIndex = distribution(gen);
-    cout << "piece chosen: " << randomIndex << "\n";
     auto *piece = pieces[randomIndex];
 
     // vector<VectorInt> moves;
