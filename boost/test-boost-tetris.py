@@ -151,6 +151,8 @@ def collect_experiences(tetris):
             tetris.score = tetris.board.getScore()
             print("score is:")
             print(tetris.score)
+            print("prev score is:")
+            print(tetris.previous_score)
             reward = tetris.getReward(tetris.score, tetris.previous_score)
             # print("next_state =\n", tetris.next_state)
             # print("action = ", action)
