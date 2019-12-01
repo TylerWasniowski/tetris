@@ -156,14 +156,17 @@ class Board {
     array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape = piece->getShape();
     set<array<int, 3>> moves;
 
+    cout << "Finished setup for getmoves(piece, row, col, rot)\n";
+
+
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
         if (shape[r][c]) {
-            cout << "checking move valid\n";
+//            cout << "checking move valid\n";
             if (isMoveValid(piece, row - r, col - c, rot)) {
             moves.insert({{row - r, col - c, rot}});
           }
-            cout << "post checking move valid\n";
+//            cout << "post checking move valid\n";
 
             resetVisited();
           piece->setRot(rot);
