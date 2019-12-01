@@ -6,13 +6,12 @@ import numpy as np
 import pickle
 from tqdm import tqdm
 from collections import deque
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.optimizers import Adam
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
-from keras import backend as K
-from keras.utils import multi_gpu_model
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend as K
+from tensorflow.keras.utils import multi_gpu_model
 
 
 class Tetris:
@@ -75,9 +74,8 @@ class DQN:
         self.epsilon_decay = (
             self.epsilon - self.epsilon_min) / (epsilon_stop_episode)
         self.model = self.build_model()
-        self.parallel_model = multi_gpu_model(self.model, gpus=2)
-        self.parallel_model.compile(loss="mse", optimizer="adam")
-
+        self.parallel_model = 
+        
     def build_model(self):
         model = Sequential()
         model.add(Dense(32, input_shape=self.state_shape,
@@ -120,8 +118,8 @@ class DQN:
             # print("target_f: ", target_f)
             target_f[0][0] = target
             # target_f[0][action] = target
-            # self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
-            self.parallel_model.fit(current_state, target_f, epochs=epochs, verbose=0)
+            self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
+            # self.parallel_model.fit(current_state, target_f, epochs=epochs, verbose=0)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon -= self.epsilon_decay
@@ -250,10 +248,10 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
 
 
 def main():
-    session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-    print("Print:", session_gpu)
+    # session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    # print("Print:", session_gpu)
 
-    print("available gpus:", K.tensorflow_backend._get_available_gpus())
+    # print("available gpus:", K.tensorflow_backend._get_available_gpus())
 
     tetris = Tetris()
 
