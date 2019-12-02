@@ -80,6 +80,7 @@ class Game:
             for move in moves:
                 board = self.tetris.getBoardArray(move)
                 obs = observations.compressed(observations.from_board(board))
+                print(obs)
                 score = self.model.score(obs)
                 if score > best_score:
                     best_move = move
