@@ -121,12 +121,14 @@ def test_model(model, n_iter=1000):
     game = Game(model)
 
     avg_score = 0
+    max_score = 0
     for n in tqdm(range(n_iter)):
         # Play until out of moves
         game.play(n_moves=123456789, skip_render=True, sleep=0)
         avg_score += game.tetris.score / n_iter
+        max_score = max(max_score, game.tetris.score)
 
-    return avg_score
+    return avg_score, max_score
 
 
 
