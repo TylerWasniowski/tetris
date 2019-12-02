@@ -81,6 +81,8 @@ class Game:
             for move in moves:
                 board = self.tetris.getBoardArray(move)
                 obs = np.array(observations.compressed(observations.from_board(board)))
+                # Max compressed obs
+                obs = np.clip(obs, None, 16)
                 score = self.model.score(obs)
                 if score > best_score:
                     best_move = move
