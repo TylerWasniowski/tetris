@@ -89,7 +89,7 @@ class Game:
                 return
 
             self.tetris.place(best_move)
-            if skip_render:
+            if not skip_render:
                 self.tetris.render()
 
     def render(self):
