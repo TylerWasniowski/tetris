@@ -14,9 +14,10 @@ namespace tetris {
   const int PIECE_SIZE = 4;
   const int ROTATIONS = 4;
   const int NUM_SHAPES = 8;
+  const int NUM_SCORES = 5;
 
   // Scores for 1, 2, ..., n line clears with a single placement
-  const array<int, PIECE_SIZE> SCORES = {{40, 100, 300, 1200}};
+  const array<int, NUM_SCORES> SCORES = {{0, 40, 100, 300, 1200}};
 
   const array<array<bool, PIECE_SIZE>, PIECE_SIZE> BLANK_SHAPE = {
       {{false, false, false, false},
@@ -320,8 +321,8 @@ class Board {
     int rowsCompleted = 0;
     for (int r = 0; r < PIECE_SIZE; r++) {
       for (int c = 0; c < PIECE_SIZE; c++) {
-        // if (isOutOfBounds(row + r, col + c))
-        board[row + r][col + c] |= shape[r][c];
+        if (!isOutOfBounds(row + r, col + c))
+          board[row + r][col + c] |= shape[r][c];
       }
 
       if (isRowCompleted(row + r)) {
