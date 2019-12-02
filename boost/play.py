@@ -90,7 +90,7 @@ class Game:
                     best_score = score
 
             if best_move is None:
-                return
+                return self.tetris.score
 
             self.tetris.place(best_move)
             if not skip_render:
@@ -101,18 +101,25 @@ class Game:
         self.tetris.render()
 
 
-def hmm(n=8):
-    return Game(ai.load_hmm(n))
+def hmm_model(n=8):
+    return ai.load_hmm(n)
 
 
-def test_hmm(n=8, iter=1000):
-    game = hmm(n)
+def random_model():
+    class Random:
+        def score(_):
+            return random.random()
+    return Random()
+
+
+def test_model(model, n_iter=1000):
+    game = Game(model)
 
     avg_score = 0
-    for n in tqdm(range(iter)):
+    for n in tqdm(range(n_iter)):
         # Play until out of moves
         game.play(n_moves=123456789, skip_render=True)
-        avg_score += game.tetris.score / iter
+        avg_score += game.tetris.score / n_iter
 
     return avg_score
 
