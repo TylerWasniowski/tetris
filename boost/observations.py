@@ -35,7 +35,7 @@ def compressed(raw_obs=None):
                 board[i] -= min_obs - 1
         compressed_obs.extend(board)
 
-    return np.array([compressed_obs]).T
+    return np.array([compressed_obs], dtype=int).T
 
 
 # hmmlearn expects no intermediate symbols skipped (if 20 is in the list, 0-19 should be too), this adds missing symbols
@@ -51,7 +51,7 @@ def to_training_input(observations):
 
 # Returns an array of 10 numbers, each number represents the location of the highest occupied block in each column
 def from_board(board, start_row=0):
-    obs = np.zeros(BOARD_SIZE[1])
+    obs = np.zeros(BOARD_SIZE[1], dtype=int)
     for col in range(0, BOARD_SIZE[1]):
         obs[col] = BOARD_SIZE[0]
         for row in range(start_row, BOARD_SIZE[0]):
