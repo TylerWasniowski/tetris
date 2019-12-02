@@ -79,6 +79,8 @@ class Game:
             best_score = -math.inf
             for move in moves:
                 board = self.tetris.getBoardArray(move)
+                print(board)
+                print(observations.from_board)
                 obs = observations.compressed(observations.from_board(board))
                 print(obs)
                 score = self.model.score(obs)
