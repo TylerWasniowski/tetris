@@ -1,4 +1,4 @@
-import tetris
+import tetris_boost as tetris
 import random
 import math
 from statistics import mean

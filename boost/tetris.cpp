@@ -565,7 +565,7 @@ int main() {
   return 0;
 }
 
-BOOST_PYTHON_MODULE(tetris) {
+BOOST_PYTHON_MODULE(tetris_boost) {
   using namespace boost::python;
 
   void (Board::*place)(int pieceIndex, int row, int col, int rot) =
