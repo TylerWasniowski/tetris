@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import random
+import time
 from tqdm import tqdm
 
 import ai
@@ -74,7 +75,7 @@ class Game:
         self.model = model
         self.tetris = Tetris()
 
-    def play(self, n_moves=1, skip_render=False):
+    def play(self, n_moves=1, skip_render=False, sleep=1):
         for n in range(n_moves):
             moves = self.tetris.getMovesArray()
             best_move = None
@@ -96,6 +97,7 @@ class Game:
             if not skip_render:
                 print(best_move)
                 self.tetris.render()
+            time.sleep(sleep)
 
     def render(self):
         self.tetris.render()
@@ -118,7 +120,7 @@ def test_model(model, n_iter=1000):
     avg_score = 0
     for n in tqdm(range(n_iter)):
         # Play until out of moves
-        game.play(n_moves=123456789, skip_render=True)
+        game.play(n_moves=123456789, skip_render=True, sleep=0)
         avg_score += game.tetris.score / n_iter
 
     return avg_score
