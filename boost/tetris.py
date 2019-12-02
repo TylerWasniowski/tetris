@@ -120,8 +120,8 @@ class DQN:
         model.add(Dense(32, input_shape=self.state_shape,
                         activation="relu", batch_size=None))
         model.add(Dense(32, activation="relu", batch_size=None))
-        model.add(Flatten())
-        model.add(Dense(4, activation="linear", batch_size=None))
+        # model.add(Flatten())
+        model.add(Dense(1, activation="linear", batch_size=None))
         model.compile(loss="mse", optimizer="adam")
         return model
 
@@ -176,6 +176,9 @@ class DQN:
         y = np.array(y)
 
         print("x.shape:", x.shape)
+        print("y.shape:", y.shape)
+
+        y = np.expand_dims(y, axis=0)
         print("y.shape:", y.shape)
 
         self.model.fit(x, y, batch_size=batch_size, epochs=epochs, verbose=0)
