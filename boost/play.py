@@ -12,7 +12,6 @@ import tetris_boost
 class Tetris:
     def __init__(self):
         self.score = 0
-        self.previous_score = 0
         self.move_columns = 4
         self.board_height = 20
         self.board_width = 10
@@ -42,10 +41,6 @@ class Tetris:
                     rend, i, j)
         return self.boardArray
 
-    def getReward(self, score, previous_score):
-        reward = score - previous_score
-        return reward
-
     def place(self, move):
         self.board.place(int(move[0]), int(move[1]), int(move[2]), int(move[3]))
         self.score = self.board.getScore()
@@ -64,8 +59,7 @@ class Tetris:
 
     def reset(self):
         self.board.reset()
-        self.boardArray = np.zeros(self.state_shape)
-        self.previous_score = 0
+        self.boardArray = np.zeros(self.state_shape, dtype=bool)
         self.score = 0
         self.movesPlayed = 0
 
@@ -100,11 +94,14 @@ class Game:
                 self.tetris.render()
                 if self.tetris.score > old_score:
                     print("Scored", self.tetris.score - old_score)
-            self.tetris.reset()
+
             time.sleep(sleep)
 
     def render(self):
         self.tetris.render()
+
+    def reset(self):
+        self.tetris.reset()
 
 
 def hmm_model(n=8):
@@ -128,6 +125,7 @@ def test_model(model, n_iter=1000):
         game.play(n_moves=123456789, skip_render=True, sleep=0)
         avg_score += game.tetris.score / n_iter
         max_score = max(max_score, game.tetris.score)
+        game.reset()
 
     return avg_score, max_score
 
