@@ -5,7 +5,7 @@ import pickle
 
 
 HMM_FILE_NAME_BASE = "hmm_"
-HMM_FILE_NAME_EXTENSION = ".hmm"
+HMM_FILE_NAME_EXTENSION = "_2c.hmm"
 
 
 def load_hmm(n=8):

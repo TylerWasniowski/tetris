@@ -11,4 +11,5 @@ parser.add_argument("--restarts", "-r", help="Times to restart with new initial 
 parser.add_argument("--verbose", "-v", help="Print score each iter", default=False, type=bool)
 args = parser.parse_args()
 
-ai.train_hmm(observations.compressed(), n=args.n, n_iter=args.iters, restarts=args.restarts, verbose=args.verbose)
+obs = observations.to_training_input(observations.compressed())
+ai.train_hmm(obs, n=args.n, n_iter=args.iters, restarts=args.restarts, verbose=args.verbose)
