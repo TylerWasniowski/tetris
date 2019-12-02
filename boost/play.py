@@ -30,8 +30,8 @@ class Tetris:
 
         for i in range(self.numberOfMoves):
             for j in range(self.move_columns):
-                self.movesArray[i, j] = self.board.getValueOfVectorInts(
-                    moves, i, j)
+                self.movesArray[i, j] = int(self.board.getValueOfVectorInts(
+                    moves, i, j))
         return self.movesArray
 
     def getBoardArray(self, move):
