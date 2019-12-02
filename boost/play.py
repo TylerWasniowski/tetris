@@ -69,7 +69,7 @@ class Tetris:
 
 
 class Game:
-    def __index__(self, model):
+    def __init__(self, model):
         self.model = model
         self.tetris = Tetris()
 
