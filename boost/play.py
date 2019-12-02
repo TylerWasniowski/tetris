@@ -107,7 +107,7 @@ def hmm_model(n=8):
 
 def random_model():
     class Random:
-        def score(_):
+        def score(self, _):
             return random.random()
     return Random()
 
