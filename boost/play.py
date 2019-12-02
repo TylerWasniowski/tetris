@@ -100,6 +100,7 @@ class Game:
                 self.tetris.render()
                 if self.tetris.score > old_score:
                     print("Scored", self.tetris.score - old_score)
+            self.tetris.reset()
             time.sleep(sleep)
 
     def render(self):
