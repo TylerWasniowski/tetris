@@ -85,7 +85,7 @@ class Game:
                     best_move = move
                     best_score = score
 
-            if not best_move:
+            if best_move is None:
                 return
 
             self.tetris.place(best_move)

@@ -16,7 +16,7 @@ def raw(file_name="../full_observations_A=0.0_U=20.0.txt", start_char='A', end_c
 
 
 def compressed(raw_obs=None):
-    if not raw_obs:
+    if raw_obs is None:
         raw_obs = raw().T[0]
 
     compressed_obs = []
