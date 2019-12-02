@@ -16,17 +16,16 @@ class Tetris:
         self.board_height = 20
         self.board_width = 10
         self.state_shape = (self.board_height, self.board_width)
-        self.boardArray = np.zeros(self.state_shape)
-        self.randomMove = np.zeros((1, 4))
+        self.boardArray = np.zeros(self.state_shape, dtype=bool)
         self.board = tetris_boost.Board()
         self.numberOfMoves = 0
-        self.movesArray = np.zeros((0, 0))
+        self.movesArray = np.zeros((0, 0), dtype=int)
         self.movesPlayed = 0
 
     def getMovesArray(self):
         moves = self.board.getMoves()
         self.numberOfMoves = self.board.getNumberOfMoves()
-        self.movesArray = np.zeros((self.numberOfMoves, self.move_columns))
+        self.movesArray = np.zeros((self.numberOfMoves, self.move_columns), dtype=int)
 
         for i in range(self.numberOfMoves):
             for j in range(self.move_columns):
