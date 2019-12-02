@@ -93,10 +93,13 @@ class Game:
             if best_move is None:
                 return self.tetris.score
 
+            old_score = self.tetris.score
             self.tetris.place(best_move)
             if not skip_render:
                 print(best_move)
                 self.tetris.render()
+                if self.tetris.score > old_score:
+                    print("Scored", self.tetris.score - old_score)
             time.sleep(sleep)
 
     def render(self):
