@@ -16,7 +16,7 @@ const int ROTATIONS = 4;
 const int NUM_SHAPES = 8;
 
 // Scores for 1, 2, ..., n line clears with a single placement
-const array<int, PIECE_SIZE> SCORES = {{40, 100, 300, 1200}};
+const array<int, PIECE_SIZE> SCORES = {{0, 40, 100, 300, 1200}};
 
 const array<array<bool, PIECE_SIZE>, PIECE_SIZE> BLANK_SHAPE = {
     {{false, false, false, false},
