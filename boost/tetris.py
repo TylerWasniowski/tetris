@@ -7,8 +7,9 @@ import pickle
 from tqdm import tqdm
 from collections import deque
 from keras.models import Sequential
-from keras.layers import Dense, Flatten
+from keras.layers import Dense, Flatten, MaxPooling1D
 from keras.optimizers import Adam
+# import keras.utils.np_utils.to_categorical
 
 # from tensorflow.keras.models import Sequential
 # from tensorflow.keras.layers import Dense
@@ -119,61 +120,71 @@ class DQN:
         model.add(Dense(32, input_shape=self.state_shape,
                         activation="relu", batch_size=None))
         model.add(Dense(32, activation="relu", batch_size=None))
-        model.add(Dense(1, activation="linear", batch_size=None))
+        model.add(Flatten())
+        model.add(Dense(4, activation="linear", batch_size=None))
         model.compile(loss="mse", optimizer="adam")
         return model
 
     def add_experience(self, current_state, next_state, action, reward):
         self.experiences.append((current_state, next_state, action, reward))
 
-    def best_action(self, states, reward):
+    def best_action(self, states):
         max_value = None
         best_action = None
 
-        # actions = []
-
         for state in states:
             state[0] = np.expand_dims(state[0], axis=0)
-            value = np.max(self.model.predict(state[0]))
 
+            prediction = self.model.predict(state[0])
+            # print("prediction:", prediction)
+
+            value = np.max(prediction)
+            # print("value:", value)
+            
             best_action = state[1]
+            # print("best_action:", best_action)
 
             if not max_value or value > max_value:
                 max_value = value
                 best_action = state[1]
-            
-            # actions.append(state[1])
-        
-        # if random.random() <= self.epsilon:
-        #     print("random move")
-        #     return random.choice(actions)
+
+        # print("best_action:", best_action)
 
         return best_action
 
         # return states[-1][1]
 
-        # predictions = []
-        # indices = []
-        # actions = []
-
-        # for state in states:
-        #     state[0] = np.expand_dims(state[0], axis=0)
-
-        #     prediction = self.model.predict(state[0])
-
-        #     value = np.max(prediction)
-        #     index = np.argmax(prediction)
-
-        #     predictions.append(value)
-        #     indices.append(index)
-
-        #     actions.append(state[1])
-
-        #     q_value = reward + self.discount * np.amax(self.model.predict(state[0]))
-        #     print("q_value:", q_value)
-
     def train(self, batch_size=32, epochs=3):
         batch = random.sample(self.experiences, batch_size)
+
+        next_states = np.array([x[1] for x in batch])
+        next_qs = [x[0] for x in self.model.predict(next_states)]
+
+        x = []
+        y = []
+
+        for i, (state, _, reward, done) in enumerate(batch):
+            if not done:
+                new_q = reward + self.discount * next_qs[i]
+            else:
+                new_q = reward
+
+            x.append(state)
+            y.append(new_q)
+
+        x = np.array(x)
+        y = np.array(y)
+
+        print("x.shape:", x.shape)
+        print("y.shape:", y.shape)
+
+        self.model.fit(x, y, batch_size=batch_size, epochs=epochs, verbose=0)
+
+        if self.epsilon > self.epsilon_min:
+            self.epsilon -= self.epsilon_decay
+
+    # def train(self, batch_size=32, epochs=3):
+    #     batch = random.sample(self.experiences, batch_size)
 
         # for current_state, next_state, action, reward in batch:
         #     if current_state is None:
@@ -274,8 +285,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
 
             next_states = tetris.get_next_states()
 
-            best_action = dqn.best_action(next_states, tetris.get_reward(
-                tetris.score, tetris.previous_score))
+            best_action = dqn.best_action(next_states)
 
             # print("best_action:", best_action)
 
@@ -295,8 +305,8 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
             tetris.score = tetris.board.getScore()
             reward = tetris.get_reward(tetris.score, tetris.previous_score)
 
-            tetris.print_board()
-            print("score = ", tetris.score)
+            # tetris.print_board()
+            # print("score = ", tetris.score)
 
             numberOfMovesPlayed += 1
 
