@@ -47,7 +47,8 @@ class Tetris:
 
     def place(self, move):
         self.board.place(int(move[0]), int(move[1]), int(move[2]), int(move[3]))
-        return self.getBoardArray(move)
+        self.score = self.board.getScore()
+        self.getBoardArray(move)
 
     def render(self):
         board_str = ""
