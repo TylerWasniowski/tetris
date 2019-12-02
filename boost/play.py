@@ -34,7 +34,7 @@ class Tetris:
         return self.movesArray
 
     def getBoardArray(self, move):
-        rend = self.board.rend(move[0], move[1], move[2], move[3])
+        rend = self.board.rend(int(move[0]), int(move[1]), int(move[2]), int(move[3]))
         for i in range(self.board_height):
             for j in range(self.board_width):
                 self.boardArray[i, j] = self.board.getValueOfVectorBools(
@@ -46,7 +46,7 @@ class Tetris:
         return reward
 
     def place(self, move):
-        self.board.place(move[0], move[1], move[2], move[3])
+        self.board.place(int(move[0]), int(move[1]), int(move[2]), int(move[3]))
 
     def render(self):
         board_str = ""
