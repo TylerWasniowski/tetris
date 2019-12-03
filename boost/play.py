@@ -115,19 +115,21 @@ def random_model():
     return Random()
 
 
-def test_model(model, n_iter=1000):
+def test_model(model, n_iter=1000, save_filename=None):
     game = Game(model)
 
-    avg_score = 0
-    max_score = 0
+    scores = []
     for n in tqdm(range(n_iter)):
         # Play until out of moves
         game.play(n_moves=123456789, skip_render=True, sleep=0)
-        avg_score += game.tetris.score / n_iter
-        max_score = max(max_score, game.tetris.score)
+
+        scores.append(game.tetris.score)
+        if save_filename is not None:
+            np.save(save_filename, scores)
+
         game.reset()
 
-    return avg_score, max_score
+    return scores
 
 
 
