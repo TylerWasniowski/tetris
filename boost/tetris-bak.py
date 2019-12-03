@@ -342,6 +342,8 @@ def main():
     print("scores from file:", read_from_file("scores.csv"))
     print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
 
+    dqn.model.save("dqn_model.h5")
+
 
 if __name__ == "__main__":
     main()
