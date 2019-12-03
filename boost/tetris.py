@@ -133,6 +133,7 @@ with mirrored_strategy.scope():
                 # prediction = self.model.predict(tensor)
                 # print("prediction:", prediction)
 
+                prediction = [10]
                 value = np.max(prediction)
                 # print("value:", value)
 
