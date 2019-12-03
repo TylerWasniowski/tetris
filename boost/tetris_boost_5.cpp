@@ -16,7 +16,7 @@ const int ROTATIONS = 4;
 const int NUM_SHAPES = 8;
 
 // Scores for 0, 1, 2, ..., n line clears with a single placement
-const array<int, 5> SCORES = {{0, 40, 100, 300, 1200, 6000}};
+const array<int, 6> SCORES = {{0, 40, 100, 300, 1200, 6000}};
 
 const array<array<bool, PIECE_SIZE>, PIECE_SIZE> BLANK_SHAPE = {
     {{false, false, false, false},
@@ -495,75 +495,6 @@ class Board {
     }
   }
 };
-
-int main() {
-  srand(23477846);
-
-  auto *board = new Board;
-  auto *blankPiece = new Piece(BLANK_SHAPE);
-  auto *straightPiece = new Piece(STRAIGHT_SHAPE);
-  auto *lPiece = new Piece(L_SHAPE);
-  auto *flippedLPiece = new Piece(FLIPPED_L_SHAPE);
-  auto *zigZagPiece = new Piece(ZIG_ZAG_SHAPE);
-  auto *flippedZigZagPiece = new Piece(FLIPPED_ZIG_ZAG_SHAPE);
-  auto *squarePiece = new Piece(SQUARE_SHAPE);
-  auto *tPiece = new Piece(T_SHAPE);
-
-  array<Piece *, 7> pieces = {
-      straightPiece,      lPiece,      flippedLPiece, zigZagPiece,
-      flippedZigZagPiece, squarePiece, tPiece};
-
-  board->render(blankPiece);
-
-  for (int n = 0; n < 10; n++) {
-    set<array<int, 4>> moves = board->getMoves(pieces);
-    if (moves.empty()) break;
-    int selectedMove = rand() % moves.size();
-    int i = 0;
-    for (array<int, 4> move : moves) {
-      if (i++ == selectedMove) {
-        cout << move[0] << ", " << move[1] << ", " << move[2] << ", " << move[3]
-             << "\n";
-        pieces[move[0]]->setPos(move[1], move[2]);
-        pieces[move[0]]->setRot(move[3]);
-        board->place(pieces[move[0]]);
-        array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape =
-            pieces[move[0]]->getShape();
-        for (int r = 0; r < PIECE_SIZE; r++) {
-          for (int c = 0; c < PIECE_SIZE; c++) {
-            cout << (shape[r][c] ? "X" : "-");
-          }
-          cout << "\n";
-        }
-        board->render(pieces[move[0]]);
-        break;
-      }
-    }
-  }
-
-  cout << "\n"
-       << "\n"
-       << "\n"
-       << "Next moves:\n";
-  set<array<int, 4>> moves = board->getMoves(pieces);
-  for (array<int, 4> move : moves) {
-    cout << move[0] << ", " << move[1] << ", " << move[2] << ", " << move[3]
-         << "\n";
-    pieces[move[0]]->setPos(move[1], move[2]);
-    pieces[move[0]]->setRot(move[3]);
-    array<array<bool, PIECE_SIZE>, PIECE_SIZE> shape =
-        straightPiece->getShape();
-    for (int r = 0; r < PIECE_SIZE; r++) {
-      for (int c = 0; c < PIECE_SIZE; c++) {
-        cout << (shape[r][c] ? "X" : "-");
-      }
-      cout << "\n";
-    }
-    board->render(pieces[move[0]]);
-  }
-
-  return 0;
-}
 
 BOOST_PYTHON_MODULE(tetris_boost_5) {
   using namespace boost::python;
