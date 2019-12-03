@@ -325,6 +325,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
         scores.append(tetris.score)
         movesPlayed.append(numberOfMovesPlayed)
 
+
         singleLineClears.append(tetris.singleLineClear)
         doubleLineClears.append(tetris.doubleLineClear)
         tripleLineClears.append(tetris.tripleLineClear)
@@ -373,7 +374,7 @@ def read_from_file(filename):
 def main():
     tetris = Tetris()
 
-    dqn = DQN(state_shape=tetris.state_shape, experience_size=100,
+    dqn = DQN(state_shape=tetris.state_shape, experience_size=10000,
               discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
 
     collect_experiences(tetris, dqn)
