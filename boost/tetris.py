@@ -330,7 +330,7 @@ with mirrored_strategy.scope():
 
     def read_from_file(filename):
         with open(f"{filename}", "r") as file:
-            return np.read(filename)
+            return np.load(filename)
 
     def main():
         # session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
@@ -348,8 +348,8 @@ with mirrored_strategy.scope():
         train_model(tetris, dqn, batch_size=32,
                     epochs=3, episodes=20, train_every=5)
 
-        print("scores from file:", read_from_file("scores"))
-        print("movesPlayed from file:", read_from_file("movesPlayed"))
+        print("scores from file:", read_from_file("scores.npy"))
+        print("movesPlayed from file:", read_from_file("movesPlayed.npy"))
 
     if __name__ == "__main__":
         main()
