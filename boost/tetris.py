@@ -130,7 +130,8 @@ with mirrored_strategy.scope():
             for state in states:
                 tensor = tf.convert_to_tensor([tf.convert_to_tensor(state[0])])
 
-                prediction = self.model.predict(tensor)
+                # prediction = self.model.predict(tensor)
+                prediction = [10]
                 # print("prediction:", prediction)
 
                 value = np.max(prediction)
