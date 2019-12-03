@@ -131,7 +131,6 @@ with mirrored_strategy.scope():
                 tensor = tf.convert_to_tensor([tf.convert_to_tensor(state[0])])
 
                 # prediction = self.model.predict(tensor)
-                prediction = [10]
                 # print("prediction:", prediction)
 
                 value = np.max(prediction)
@@ -154,7 +153,7 @@ with mirrored_strategy.scope():
             batch = random.sample(self.experiences, batch_size)
 
             next_states = tf.convert_to_tensor([tf.convert_to_tensor(x[1]) for x in batch])
-            next_qs = [x[0] for x in np.zeros((20000, 1))]
+            next_qs = [x[0] for x in self.model.predict(next_states)]
 
             x = []
             y = []
