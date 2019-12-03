@@ -58,15 +58,31 @@ def get_blocks(frame, board_start):
     return blocks
 
 
-# Draws white blocks over occupied spaces and black blocks over non-occupied spaces
+# Draws white blocks over occupied spaces and red dots over non-occupied spaces
 def draw_blocks(frame, blocks, board_start):
     for i in range(0, blocks.shape[0]):
         for j in range(0, blocks.shape[1]):
+            top_left = (board_start[0] + j * BLOCK_SIZE, board_start[1] + i * BLOCK_SIZE)
+            bottom_right = (board_start[0] + (j + 1) * BLOCK_SIZE, board_start[1] + (i + 1) * BLOCK_SIZE)
+
+            center = tuple((np.array(top_left) + np.array(bottom_right)) // 2)
+            frame = cv.circle(frame, center, 5, (0, 0, 255), cv.FILLED)
+
             if blocks[i][j]:
-                top_left = (board_start[0] + j * BLOCK_SIZE, board_start[1] + i * BLOCK_SIZE)
-                bottom_right = (board_start[0] + (j + 1) * BLOCK_SIZE, board_start[1] + (i + 1) * BLOCK_SIZE)
-                color = 255, 255, 255
-                frame = cv.rectangle(frame, top_left, bottom_right, color, cv.FILLED)
+                frame = cv.rectangle(frame, top_left, bottom_right, (255, 255, 255), cv.FILLED)
+                frame = cv.rectangle(frame, top_left, bottom_right, (0, 0, 0), 2)
+
+    return frame
+
+
+# Draws green lines over the observations
+def draw_observations(frame, observations, board_start):
+    for j in range(len(observations)):
+        i = int(observations[j])
+        top_left = (board_start[0] + j * BLOCK_SIZE, board_start[1] + i * BLOCK_SIZE)
+        top_right = (top_left[0] + BLOCK_SIZE, top_left[1])
+
+        frame = cv.line(frame, top_left, top_right, (0, 255, 0), 2)
 
     return frame
 
@@ -164,16 +180,17 @@ while video.isOpened():
     blocks_count = blocks_count_new
 
     frame = draw_blocks(frame, blocks, board_start)
+    frame = draw_observations(frame, all_observations[-1], board_start)
     frame = write(frame, "Frame: " + str(frame_pos), 0)
     frame = write(frame, "# Blocks: " + str(blocks_count), 1)
     frame = write(frame, "State #: " + str(len(all_observations)), 2)
     frame = write(frame, "Observations: " + str(all_observations[-1]), 3)
 
-    # cv.imshow('Frame', frame)
+    cv.imshow('Frame', frame)
 
-    # # Wait 1ms, exit on q
-    # if cv.waitKey(1) & 0xFF == ord('q'):
-    #     break
+    # Wait 1ms, exit on q
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        break
     frame_pos += 1
 
 np.save("observations_2_Finals_2016_Classic_Tetris_World_Championship_clipped.mp4.npy", all_observations)
