@@ -112,6 +112,9 @@ class DQN:
         model.compile(loss="mse", optimizer="adam")
         return model
 
+    def save_model(self, episode):
+        self.model.save(f"dqn_model_{episode}.h5")
+
     def add_experience(self, current_state, next_state, action, reward):
         self.experiences.append((current_state, next_state, action, reward))
 
@@ -257,7 +260,7 @@ def collect_experiences(tetris, dqn):
             tetris.reset()
 
 
-def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
+def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_every):
     scores = []
     movesPlayed = []
 
@@ -303,7 +306,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
 
             tetris.current_state = tetris.boardArray
 
-        # print("score:", tetris.score)
+            # print("score:", tetris.score)
 
         scores.append(tetris.score)
         movesPlayed.append(numberOfMovesPlayed)
@@ -313,6 +316,9 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
 
         print_to_file(scores, "scores.csv")
         print_to_file(movesPlayed, "movesPlayed.csv")
+
+        if episode % save_every == 0:
+            dqn.save_model(episode)
 
     print_stats(scores, "scores", episodes)
     print_stats(movesPlayed, "movesPlayed", episodes)
@@ -337,12 +343,10 @@ def main():
     collect_experiences(tetris, dqn)
 
     train_model(tetris, dqn, batch_size=32,
-                epochs=3, episodes=50, train_every=5)
+                epochs=10000, episodes=1000, train_every=5, save_every=5)
 
     print("scores from file:", read_from_file("scores.csv"))
     print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
-
-    dqn.model.save("dqn_model.h5")
 
 
 if __name__ == "__main__":
