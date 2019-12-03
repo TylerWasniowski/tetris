@@ -22,6 +22,7 @@ class Tetris:
         self.numberOfMoves = 0
         self.movesArray = np.zeros((0, 0), dtype=int)
         self.movesPlayed = 0
+        self.linesCleared = np.zeros(4)
 
     def getMovesArray(self):
         moves = self.board.getMoves()
@@ -44,8 +45,20 @@ class Tetris:
 
     def place(self, move):
         self.board.place(int(move[0]), int(move[1]), int(move[2]), int(move[3]))
+        old_score = self.score
         self.score = self.board.getScore()
+
+        if self.score > old_score + 300:
+            self.linesCleared[3] += 1
+        elif self.score > old_score + 100:
+            self.linesCleared[2] += 1
+        elif self.score > old_score + 40:
+            self.linesCleared[1] += 1
+        elif self.score > old_score:
+            self.linesCleared[0] += 1
+
         self.getBoardArray(move)
+        self.movesPlayed += 1
 
     def render(self):
         board_str = ""
@@ -63,6 +76,7 @@ class Tetris:
         self.boardArray = np.zeros(self.state_shape, dtype=bool)
         self.score = 0
         self.movesPlayed = 0
+        self.linesCleared = np.zeros(4)
 
 
 class Game:
@@ -118,23 +132,25 @@ def random_model():
 def test_model(model, n_iter=1000, save_filename=None):
     game = Game(model)
 
-    scores = []
+    stats = [[], [], []]
     for n in tqdm(range(n_iter)):
         # Play until out of moves
         game.play(n_moves=123456789, skip_render=True, sleep=0)
 
-        scores.append(game.tetris.score)
+        stats[0].append(game.tetris.score)
+        stats[1].append(game.tetris.movesPlayed)
+        stats[2].append(game.tetris.linesCleared)
         if save_filename is not None:
-            np.save(save_filename, scores)
+            np.save(save_filename, stats)
 
         game.reset()
 
-    return scores
+    return stats
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--filename", "-f", help="File to save the scores in", default="hmm_score.npy", type=str)
+    parser.add_argument("--filename", "-f", help="File to save the scores in", default="hmm_stats.npy", type=str)
     parser.add_argument("--model", "-m", help="Model to play ('hmm', or 'random')", default="hmm", type=str)
     parser.add_argument("--n", "-n", help="Number of hidden states", default=4, type=int)
     parser.add_argument("--n_iter", "-i", help="Number of games to play", default=1000, type=int)

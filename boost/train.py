@@ -16,6 +16,6 @@ if args.compressed:
     obs = observations.compressed()
 else:
     obs = observations.raw()
-    
+
 obs = observations.to_training_input(obs)
 ai.train_hmm(obs, n=args.n, n_iter=args.iters, restarts=args.restarts, verbose=args.verbose)
