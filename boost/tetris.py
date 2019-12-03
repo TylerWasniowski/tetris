@@ -317,22 +317,27 @@ with mirrored_strategy.scope():
             scores.append(tetris.score)
             movesPlayed.append(numberOfMovesPlayed)
 
+            print_to_file(str(scores[episode]), "scores")
+            print_to_file(str(movesPlayed[episode]), "movesPlayed")
+
             # if episode % train_every == 0:
             #     dqn.train(batch_size=batch_size, epochs=epochs)
 
         print_stats(scores, "scores", episodes)
         print_stats(movesPlayed, "movesPlayed", episodes)
 
-        print_to_file(scores, "scores")
-        print_to_file(movesPlayed, "movesPlayed")
+        # print_to_file(scores, "scores")
+        # print_to_file(movesPlayed, "movesPlayed")
 
-    def print_to_file(array, filename):
-        with open(f"{filename}", "ab") as file:
-            pickle.dump(array, file)
+    def print_to_file(item, filename):
+        with open(f"{filename}", "a") as file:
+            item = item + ","
+            file.write(item)
+
 
     def read_from_file(filename):
-        with open(f"{filename}", "rb") as file:
-            array = pickle.load(file)
+        with open(f"{filename}", "r") as file:
+            array = file.read()
 
         return array
 
@@ -352,8 +357,8 @@ with mirrored_strategy.scope():
         train_model(tetris, dqn, batch_size=32,
                     epochs=3, episodes=20, train_every=5)
 
-        # print(read_from_file("scores"))
-        # print(read_from_file("movesPlayed"))
+        print("scores from file:", read_from_file("scores"))
+        print("movesPlayed from file:", read_from_file("movesPlayed"))
 
     if __name__ == "__main__":
         main()
