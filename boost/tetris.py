@@ -128,7 +128,7 @@ with mirrored_strategy.scope():
             best_action = None
 
             for state in states:
-                tensor = tf.convert_to_tensor([state[0]])
+                tensor = tf.convert_to_tensor([tf.convert_to_tensor(state[0])])
 
                 prediction = self.model.predict(tensor)
                 # print("prediction:", prediction)
@@ -152,7 +152,7 @@ with mirrored_strategy.scope():
         def train(self, batch_size=32, epochs=3):
             batch = random.sample(self.experiences, batch_size)
 
-            next_states = tf.convert_to_tensor([x[1] for x in batch])
+            next_states = tf.convert_to_tensor([tf.convert_to_tensor(x[1]) for x in batch])
             next_qs = [x[0] for x in self.model.predict(next_states)]
 
             x = []
@@ -164,7 +164,7 @@ with mirrored_strategy.scope():
                 else:
                     new_q = reward
 
-                x.append(state)
+                x.append(tf.convert_to_tensor(state))
                 y.append(new_q)
 
             x = tf.convert_to_tensor(x)
