@@ -1,7 +1,6 @@
 import tetris_boost as tetris
 import random
 import math
-from statistics import mean
 import numpy as np
 import pickle
 from tqdm import tqdm
@@ -209,11 +208,9 @@ class DQN:
 
 def print_stats(array, label, episodes):
     print(f"{label}:\n", array)
-    print(f"min({label}):", min(array), "reached on game #",
-          np.argmin(array) + 1, "/", episodes)
-    print(f"max({label}):", max(array), "reached on game #",
-          np.argmax(array) + 1, "/", episodes)
-    print(f"mean({label}):", mean(array))
+    print(f"min({label}):", min(array))
+    print(f"max({label}):", max(array))
+    print(f"mean({label}):", np.mean(array))
 
 
 def collect_experiences(tetris, dqn):
@@ -269,7 +266,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
         notGameOver = True
         numberOfMovesPlayed = 0
 
-        print(f"Game #{episode + 1} started.")
+        # print(f"Game #{episode + 1} started.")
 
         while notGameOver:
             tetris.current_state = tetris.boardArray
