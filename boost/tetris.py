@@ -128,9 +128,9 @@ with mirrored_strategy.scope():
             best_action = None
 
             for state in states:
-                state[0] = np.expand_dims(state[0], axis=0)
+                tensor = tf.convert_to_tensor(state[0])
 
-                prediction = self.model.predict(state[0])
+                prediction = self.model.predict(tensor)
                 # print("prediction:", prediction)
 
                 value = np.max(prediction)
@@ -152,7 +152,7 @@ with mirrored_strategy.scope():
         def train(self, batch_size=32, epochs=3):
             batch = random.sample(self.experiences, batch_size)
 
-            next_states = np.array([x[1] for x in batch])
+            next_states = [tf.convert_to_tensor(x[1]) for x in batch]
             next_qs = [x[0] for x in self.model.predict(next_states)]
 
             x = []
@@ -167,14 +167,8 @@ with mirrored_strategy.scope():
                 x.append(state)
                 y.append(new_q)
 
-            x = np.array(x)
-            y = np.array(y)
-
-            print("x.shape:", x.shape)
-            print("y.shape:", y.shape)
-
-            y = np.expand_dims(y, axis=0)
-            print("y.shape:", y.shape)
+            x = [tf.convert_to_tensor(state) for state in x]
+            y = [tf.convert_to_tensor(new_q) for new_q in y]
 
             self.model.fit(x, y, batch_size=batch_size,
                            epochs=epochs, verbose=0)
