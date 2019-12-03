@@ -1,14 +1,7 @@
 import tetris_boost as tetris
 import random
-import math
 import numpy as np
-import pickle
 from tqdm import tqdm
-from collections import deque
-import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.optimizers import Adam
 
 
 class Tetris:
@@ -59,6 +52,7 @@ class Tetris:
                     state_str += "X"
             state_str += "\n"
         print(state_str)
+        print("score:", self.score)
 
     def get_reward(self, score, previous_score):
         reward = score - previous_score
@@ -81,6 +75,11 @@ class Tetris:
 
         return next_states
 
+    def best_action(self, states):
+        if len(states) > 0:
+            return states[-1][1]
+        return None
+
     def reset_temp_state(self):
         self.temp_state = self.get_board_array(self.board.rend(0, 0, 0, 0))
 
@@ -98,133 +97,10 @@ class Tetris:
         self.quadLineClear = 0
 
 
-class DQN:
-    def __init__(self, state_shape, experience_size, discount, epsilon, epsilon_min, epsilon_stop_episode):
-        self.state_shape = state_shape
-        self.experiences = deque(maxlen=experience_size)
-        self.experience_size = experience_size
-        self.discount = discount
-        self.epsilon = epsilon
-        self.epsilon_min = epsilon_min
-        self.epsilon_stop_episode = epsilon_stop_episode
-        self.epsilon_decay = (
-            self.epsilon - self.epsilon_min) / (epsilon_stop_episode)
-        self.model = self.build_model()
-
-    def build_model(self):
-        model = Sequential()
-        model.add(Dense(32, input_shape=self.state_shape,
-                        activation="relu", batch_size=None))
-        model.add(Dense(32, activation="relu", batch_size=None))
-        model.add(Dense(1, activation="linear", batch_size=None))
-        model.compile(loss="mse", optimizer="adam")
-        return model
-
-    def save_model(self, episode):
-        self.model.save(f"dqn_model_{episode}.h5")
-
-    def add_experience(self, current_state, next_state, action, reward):
-        self.experiences.append((current_state, next_state, action, reward))
-
-    def best_action(self, states):
-        max_value = None
-        best_action = None
-
-        for state in states:
-            state[0] = np.expand_dims(state[0], axis=0)
-
-            prediction = self.model.predict(state[0])
-            # print("prediction:", prediction)
-
-            value = np.max(prediction)
-            # print("value:", value)
-
-            best_action = state[1]
-            # print("best_action:", best_action)
-
-            if not max_value or value > max_value:
-                max_value = value
-                best_action = state[1]
-
-        # print("best_action:", best_action)
-
-        return best_action
-
-        # return states[-1][1]
-
-    def train(self, batch_size=32, epochs=3):
-        batch = random.sample(self.experiences, batch_size)
-
-        next_states = np.array([x[1] for x in batch])
-        next_qs = [x[0] for x in self.model.predict(next_states)]
-
-        x = []
-        y = []
-
-        for i, (state, _, reward, done) in enumerate(batch):
-            if not done:
-                new_q = reward + self.discount * next_qs[i]
-            else:
-                new_q = reward
-
-            x.append(state)
-            y.append(new_q)
-
-        x = np.array(x)
-        y = np.array(y)
-
-        print("x.shape:", x.shape)
-        print("y.shape:", y.shape)
-
-        y = np.expand_dims(y, axis=0)
-        print("y.shape:", y.shape)
-
-        self.model.fit(x, y, batch_size=batch_size, epochs=epochs, verbose=0)
-
-        if self.epsilon > self.epsilon_min:
-            self.epsilon -= self.epsilon_decay
-
-    # def train(self, batch_size=32, epochs=3):
-    #     batch = random.sample(self.experiences, batch_size)
-
-        # for current_state, next_state, action, reward in batch:
-        #     if current_state is None:
-        #         continue
-        #     next_state = np.expand_dims(next_state, axis=0)
-        #     target = reward + self.discount * \
-        #         np.amax(self.model.predict(next_state)[0])
-        #     # print("target: ", target)
-        #     # print("current_state:", current_state)
-        #     current_state = np.expand_dims(current_state, axis=0)
-        #     print("current_state:\n", current_state)
-        #     # print("current_state1:", current_state)
-        #     target_f = self.model.predict(current_state)
-        #     # print("target_f: ", target_f)
-        #     target_f[0][0] = target
-        #     # target_f[0][action] = target
-        #     # self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
-        #     self.model.fit(current_state, target_f, epochs=epochs, verbose=0)
-
-        # if self.epsilon > self.epsilon_min:
-        #     self.epsilon -= self.epsilon_decay
-
-    def write_experiences_to_file(self, filename):
-        with open(f"{filename}", "ab") as file:
-            pickle.dump(self.experiences, file)
-
-    def read_experiences_from_file(self, filename):
-        with open(f"{filename}", "rb") as file:
-            self.experiences = pickle.load(file)
-
-
-def collect_experiences(tetris, dqn):
-    # Collect experiences where each experience consists of a tuple:
-    # (current_state, next_state, action, reward)
-    # These experiences are then used to train the DQN.
-
-    for i in tqdm(range(dqn.experience_size)):
+def play_random(tetris, moves):
+    for move in tqdm(range(moves)):
         tetris.current_state = tetris.next_state
-        # print("current_state =\n", tetris.current_state)
+
         tetris.movesArray = tetris.get_moves_array(tetris.board.getMoves())
 
         if tetris.board.getNumberOfMoves() > 0:
@@ -234,12 +110,11 @@ def collect_experiences(tetris, dqn):
             continue
 
         action = tetris.movesArray[moveIndex]
+
         pieceIndex, row, col, rot = int(action[0]), int(
             action[1]), int(action[2]), int(action[3])
-        # print(f"pieceIndex: {pieceIndex}, row: {row}, col: {col}, rot: {rot}")
 
         notGameOver = tetris.board.isValid(pieceIndex, row, col, rot)
-        # print("notGameOver: ", notGameOver)
 
         if notGameOver:
             tetris.board.place(pieceIndex, row, col, rot)
@@ -250,18 +125,13 @@ def collect_experiences(tetris, dqn):
             tetris.previous_score = tetris.score
             tetris.score = tetris.board.getScore()
             reward = tetris.get_reward(tetris.score, tetris.previous_score)
-            # print("next_state =\n", tetris.next_state)
-            # print("action = ", action)
-            # print("previous_score = ", tetris.previous_score)
-            # print("reward = ", reward)
-            # print("score = ", tetris.score)
-            dqn.add_experience(tetris.current_state,
-                               tetris.next_state, action, reward)
+            
+            tetris.print_board()
         else:
             tetris.reset()
 
 
-def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_every):
+def play(tetris, games):
     scores = []
     movesPlayed = []
     singleLineClears = []
@@ -269,19 +139,19 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
     tripleLineClears = []
     quadLineClears = []
 
-    for episode in tqdm(range(episodes)):
+    for game in tqdm(range(games)):
         tetris.reset()
         notGameOver = True
         numberOfMovesPlayed = 0
 
-        # print(f"Game #{episode + 1} started.")
+        print(f"Game #{game + 1} started.")
 
         while notGameOver:
             tetris.current_state = tetris.boardArray
 
             next_states = tetris.get_next_states()
 
-            best_action = dqn.best_action(next_states)
+            best_action = tetris.best_action(next_states)
 
             # print("best_action:", best_action)
 
@@ -310,17 +180,11 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
             elif reward == 1200:
                 tetris.quadLineClear += 1
 
-            # tetris.print_board()
-            # print("score = ", tetris.score)
+            tetris.print_board()
 
             numberOfMovesPlayed += 1
 
-            dqn.add_experience(tetris.current_state,
-                               tetris.boardArray, best_action, reward)
-
             tetris.current_state = tetris.boardArray
-
-            # print("score:", tetris.score)
 
         scores.append(tetris.score)
         movesPlayed.append(numberOfMovesPlayed)
@@ -331,9 +195,6 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
         tripleLineClears.append(tetris.tripleLineClear)
         quadLineClears.append(tetris.quadLineClear)
 
-        # if episode % train_every == 0:
-        #     dqn.train(batch_size=batch_size, epochs=epochs)
-
         print_to_file(scores, "scores.csv")
         print_to_file(movesPlayed, "movesPlayed.csv")
 
@@ -341,9 +202,6 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
         print_to_file(doubleLineClears, "doubleLineClears.csv")
         print_to_file(tripleLineClears, "tripleLineClears.csv")
         print_to_file(quadLineClears, "quadLineClears.csv")
-
-        if episode % save_every == 0:
-            dqn.save_model(episode)
 
     print_stats(scores, "scores")
     print_stats(movesPlayed, "movesPlayed")
@@ -373,22 +231,18 @@ def read_from_file(filename):
 
 def main():
     tetris = Tetris()
-
-    dqn = DQN(state_shape=tetris.state_shape, experience_size=10000,
-              discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
-
-    collect_experiences(tetris, dqn)
-
-    train_model(tetris, dqn, batch_size=32,
-                epochs=3, episodes=10, train_every=5, save_every=5)
-
-    print("scores from file:", read_from_file("scores.csv"))
-    print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
     
-    print("singleLineClears from file:", read_from_file("singleLineClears.csv"))
-    print("doubleLineClears from file:", read_from_file("doubleLineClears.csv"))
-    print("tripleLineClears from file:", read_from_file("tripleLineClears.csv"))
-    print("quadLineClears from file:", read_from_file("quadLineClears.csv"))
+    play_random(tetris, moves=1000)
+
+    play(tetris, games=10)
+
+    # print("scores from file:", read_from_file("scores.csv"))
+    # print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
+    
+    # print("singleLineClears from file:", read_from_file("singleLineClears.csv"))
+    # print("doubleLineClears from file:", read_from_file("doubleLineClears.csv"))
+    # print("tripleLineClears from file:", read_from_file("tripleLineClears.csv"))
+    # print("quadLineClears from file:", read_from_file("quadLineClears.csv"))
 
 
 if __name__ == "__main__":

@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 import ai
 import observations
-import tetris_boost
+# import tetris_boost
+import tetris_boost_5 as tetris_boost
 
 
 class Tetris:
@@ -162,13 +163,3 @@ if __name__ == "__main__":
         model = random_model()
 
     test_model(model, n_iter=args.n_iter, save_filename=args.filename)
-
-
-
-
-
-
-
-
-
-

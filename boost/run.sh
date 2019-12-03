@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 tetris.py
+python3 tetris-bak.py
