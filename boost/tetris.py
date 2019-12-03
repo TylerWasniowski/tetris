@@ -311,8 +311,11 @@ with mirrored_strategy.scope():
             scores.append(tetris.score)
             movesPlayed.append(numberOfMovesPlayed)
 
-            print_to_file(scores, "scores.npy")
-            print_to_file(movesPlayed, "movesPlayed.npy")
+            # print_to_file(scores, "scores.npy")
+            # print_to_file(movesPlayed, "movesPlayed.npy")
+            
+            print_to_file(scores, "scores.csv")
+            print_to_file(movesPlayed, "movesPlayed.csv")
 
             # if episode % train_every == 0:
             #     dqn.train(batch_size=batch_size, epochs=epochs)
@@ -325,11 +328,13 @@ with mirrored_strategy.scope():
 
     def print_to_file(array, filename):
         with open(f"{filename}", "a") as file:
-            np.save(filename, array)
+            # np.save(filename, array)
+            np.savetxt(filename, array, delimiter=",")
 
     def read_from_file(filename):
         with open(f"{filename}", "r") as file:
-            return np.load(filename)
+            return np.loadtxt(filename, delimiter=",")
+            # return np.load(filename)
 
     def main():
         # session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
@@ -347,8 +352,10 @@ with mirrored_strategy.scope():
         train_model(tetris, dqn, batch_size=32,
                     epochs=3, episodes=20, train_every=5)
 
-        print("scores from file:", read_from_file("scores.npy"))
-        print("movesPlayed from file:", read_from_file("movesPlayed.npy"))
+        # print("scores from file:", read_from_file("scores.npy"))
+        # print("movesPlayed from file:", read_from_file("movesPlayed.npy"))
+        print("scores from file:", read_from_file("scores.csv"))
+        print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
 
     if __name__ == "__main__":
         main()
