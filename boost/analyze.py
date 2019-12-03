@@ -1,7 +1,7 @@
 import numpy as np
 
+print("Mean scores")
 for n in range(2, 22):
-    print("Mean scores")
     if not n == 11 and not n == 14:
         try:
             a = np.load("hmm_stats_1-" + str(n) + ".npy", allow_pickle=True)
@@ -9,8 +9,8 @@ for n in range(2, 22):
         finally:
             print()
 
+print("Std deviation scores")
 for n in range(2, 22):
-    print("Std deviation scores")
     if not n == 11 and not n == 14:
         try:
             a = np.load("hmm_stats_1-" + str(n) + ".npy", allow_pickle=True)
@@ -18,8 +18,8 @@ for n in range(2, 22):
         finally:
             print()
 
+print("Mean number of moves")
 for n in range(2, 22):
-    print("Mean number of moves")
     if not n == 11 and not n == 14:
         try:
             a = np.load("hmm_stats_1-" + str(n) + ".npy", allow_pickle=True)
@@ -27,8 +27,8 @@ for n in range(2, 22):
         finally:
             print()
 
+print("Std deviation number of moves")
 for n in range(2, 22):
-    print("Std deviation number of moves")
     if not n == 11 and not n == 14:
         try:
             a = np.load("hmm_stats_1-" + str(n) + ".npy", allow_pickle=True)
