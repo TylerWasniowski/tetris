@@ -320,27 +320,31 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
     print_stats(scores, "scores", episodes)
     print_stats(movesPlayed, "movesPlayed", episodes)
 
-    def print_to_file(array, filename):
-        with open(f"{filename}", "a") as file:
-            np.savetxt(filename, array, delimiter=",")
 
-    def read_from_file(filename):
-        with open(f"{filename}", "r") as file:
-            return np.loadtxt(filename, delimiter=",")
+def print_to_file(array, filename):
+    with open(f"{filename}", "a") as file:
+        np.savetxt(filename, array, delimiter=",")
 
-    def main():
-        tetris = Tetris()
 
-        dqn = DQN(state_shape=tetris.state_shape, experience_size=100,
-                  discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
+def read_from_file(filename):
+    with open(f"{filename}", "r") as file:
+        return np.loadtxt(filename, delimiter=",")
 
-        collect_experiences(tetris, dqn)
 
-        train_model(tetris, dqn, batch_size=32,
-                    epochs=3, episodes=20, train_every=5)
+def main():
+    tetris = Tetris()
 
-        print("scores from file:", read_from_file("scores.csv"))
-        print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
+    dqn = DQN(state_shape=tetris.state_shape, experience_size=100,
+              discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
 
-    if __name__ == "__main__":
-        main()
+    collect_experiences(tetris, dqn)
+
+    train_model(tetris, dqn, batch_size=32,
+                epochs=3, episodes=50, train_every=5)
+
+    print("scores from file:", read_from_file("scores.csv"))
+    print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
+
+
+if __name__ == "__main__":
+    main()
