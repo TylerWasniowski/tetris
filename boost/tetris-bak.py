@@ -27,6 +27,10 @@ class Tetris:
         self.temp_state = self.get_board_array(self.board.rend(0, 0, 0, 0))
         self.numberOfMoves = 0
         self.movesArray = np.zeros((0, 0))
+        self.singleLineClear = 0
+        self.doubleLineClear = 0
+        self.tripleLineClear = 0
+        self.quadLineClear = 0
 
     def get_moves_array(self, moves):
         self.numberOfMoves = self.board.getNumberOfMoves()
@@ -88,6 +92,10 @@ class Tetris:
         self.temp_state = self.get_board_array(self.board.rend(0, 0, 0, 0))
         self.previous_score = 0
         self.score = 0
+        self.singleLineClear = 0
+        self.doubleLineClear = 0
+        self.tripleLineClear = 0
+        self.quadLineClear = 0
 
 
 class DQN:
@@ -209,13 +217,6 @@ class DQN:
             self.experiences = pickle.load(file)
 
 
-def print_stats(array, label, episodes):
-    print(f"{label}:\n", array)
-    print(f"min({label}):", min(array))
-    print(f"max({label}):", max(array))
-    print(f"mean({label}):", np.mean(array))
-
-
 def collect_experiences(tetris, dqn):
     # Collect experiences where each experience consists of a tuple:
     # (current_state, next_state, action, reward)
@@ -263,6 +264,10 @@ def collect_experiences(tetris, dqn):
 def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_every):
     scores = []
     movesPlayed = []
+    singleLineClears = []
+    doubleLineClears = []
+    tripleLineClears = []
+    quadLineClears = []
 
     for episode in tqdm(range(episodes)):
         tetris.reset()
@@ -296,6 +301,15 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
             tetris.score = tetris.board.getScore()
             reward = tetris.get_reward(tetris.score, tetris.previous_score)
 
+            if reward == 40:
+                tetris.singleLineClear += 1
+            elif reward == 100:
+                tetris.doubleLineClear += 1
+            elif reward == 300:
+                tetris.tripleLineClear += 1
+            elif reward == 1200:
+                tetris.quadLineClear += 1
+
             # tetris.print_board()
             # print("score = ", tetris.score)
 
@@ -311,17 +325,39 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every, save_eve
         scores.append(tetris.score)
         movesPlayed.append(numberOfMovesPlayed)
 
+        singleLineClears.append(tetris.singleLineClear)
+        doubleLineClears.append(tetris.doubleLineClear)
+        tripleLineClears.append(tetris.tripleLineClear)
+        quadLineClears.append(tetris.quadLineClear)
+
         # if episode % train_every == 0:
         #     dqn.train(batch_size=batch_size, epochs=epochs)
 
         print_to_file(scores, "scores.csv")
         print_to_file(movesPlayed, "movesPlayed.csv")
 
+        print_to_file(singleLineClears, "singleLineClears.csv")
+        print_to_file(doubleLineClears, "doubleLineClears.csv")
+        print_to_file(tripleLineClears, "tripleLineClears.csv")
+        print_to_file(quadLineClears, "quadLineClears.csv")
+
         if episode % save_every == 0:
             dqn.save_model(episode)
 
-    print_stats(scores, "scores", episodes)
-    print_stats(movesPlayed, "movesPlayed", episodes)
+    print_stats(scores, "scores")
+    print_stats(movesPlayed, "movesPlayed")
+
+    print_stats(singleLineClears, "singleLineClears")
+    print_stats(doubleLineClears, "doubleLineClears")
+    print_stats(tripleLineClears, "tripleLineClears")
+    print_stats(quadLineClears, "quadLineClears")
+
+
+def print_stats(array, label):
+    print(f"{label}:\n", array)
+    print(f"min({label}):", min(array))
+    print(f"max({label}):", max(array))
+    print(f"mean({label}):", np.mean(array))
 
 
 def print_to_file(array, filename):
@@ -343,10 +379,15 @@ def main():
     collect_experiences(tetris, dqn)
 
     train_model(tetris, dqn, batch_size=32,
-                epochs=10000, episodes=1000, train_every=5, save_every=5)
+                epochs=3, episodes=10, train_every=5, save_every=5)
 
     print("scores from file:", read_from_file("scores.csv"))
     print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
+    
+    print("singleLineClears from file:", read_from_file("singleLineClears.csv"))
+    print("doubleLineClears from file:", read_from_file("doubleLineClears.csv"))
+    print("tripleLineClears from file:", read_from_file("tripleLineClears.csv"))
+    print("quadLineClears from file:", read_from_file("quadLineClears.csv"))
 
 
 if __name__ == "__main__":
