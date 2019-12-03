@@ -128,7 +128,7 @@ with mirrored_strategy.scope():
             best_action = None
 
             for state in states:
-                tensor = tf.convert_to_tensor(state[0])
+                tensor = tf.convert_to_tensor([state[0]])
 
                 prediction = self.model.predict(tensor)
                 # print("prediction:", prediction)
