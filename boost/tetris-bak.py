@@ -1,4 +1,4 @@
-import tetris
+import tetris_boost as tetris
 import random
 import math
 from statistics import mean
@@ -11,16 +11,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 
-# from tensorflow.keras.models import Sequential
-# from tensorflow.keras.layers import Dense
-# from tensorflow.keras.optimizers import Adam
-# from tensorflow.keras import backend as K
-# from tensorflow.keras.utils import multi_gpu_model
 
-# print(tf.config.experimental.list_physical_devices('GPU'))
-# mirrored_strategy = tf.distribute.MirroredStrategy()
-
-# with mirrored_strategy.scope():
 class Tetris:
     def __init__(self):
         self.score = 0
@@ -137,7 +128,7 @@ class DQN:
 
             value = np.max(prediction)
             # print("value:", value)
-            
+
             best_action = state[1]
             # print("best_action:", best_action)
 
@@ -219,9 +210,9 @@ class DQN:
 def print_stats(array, label, episodes):
     print(f"{label}:\n", array)
     print(f"min({label}):", min(array), "reached on game #",
-        np.argmin(array) + 1, "/", episodes)
+          np.argmin(array) + 1, "/", episodes)
     print(f"max({label}):", max(array), "reached on game #",
-        np.argmax(array) + 1, "/", episodes)
+          np.argmax(array) + 1, "/", episodes)
     print(f"mean({label}):", mean(array))
 
 
@@ -264,7 +255,7 @@ def collect_experiences(tetris, dqn):
             # print("reward = ", reward)
             # print("score = ", tetris.score)
             dqn.add_experience(tetris.current_state,
-                            tetris.next_state, action, reward)
+                               tetris.next_state, action, reward)
         else:
             tetris.reset()
 
@@ -311,7 +302,7 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
             numberOfMovesPlayed += 1
 
             dqn.add_experience(tetris.current_state,
-                            tetris.boardArray, best_action, reward)
+                               tetris.boardArray, best_action, reward)
 
             tetris.current_state = tetris.boardArray
 
@@ -323,42 +314,33 @@ def train_model(tetris, dqn, batch_size, epochs, episodes, train_every):
         # if episode % train_every == 0:
         #     dqn.train(batch_size=batch_size, epochs=epochs)
 
+        print_to_file(scores, "scores.csv")
+        print_to_file(movesPlayed, "movesPlayed.csv")
+
     print_stats(scores, "scores", episodes)
     print_stats(movesPlayed, "movesPlayed", episodes)
 
-    print_to_file(scores, "scores")
-    print_to_file(movesPlayed, "movesPlayed")
+    def print_to_file(array, filename):
+        with open(f"{filename}", "a") as file:
+            np.savetxt(filename, array, delimiter=",")
 
+    def read_from_file(filename):
+        with open(f"{filename}", "r") as file:
+            return np.loadtxt(filename, delimiter=",")
 
-def print_to_file(array, filename):
-    with open(f"{filename}", "ab") as file:
-        pickle.dump(array, file)
+    def main():
+        tetris = Tetris()
 
-def read_from_file(filename):
-    with open(f"{filename}", "rb") as file:
-        array = pickle.load(file)
-    
-    return array
+        dqn = DQN(state_shape=tetris.state_shape, experience_size=100,
+                  discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
 
-def main():
-    # session_gpu = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-    # print("Print:", session_gpu)
+        collect_experiences(tetris, dqn)
 
-    # print("available gpus:", K.tensorflow_backend._get_available_gpus())
+        train_model(tetris, dqn, batch_size=32,
+                    epochs=3, episodes=20, train_every=5)
 
-    tetris = Tetris()
+        print("scores from file:", read_from_file("scores.csv"))
+        print("movesPlayed from file:", read_from_file("movesPlayed.csv"))
 
-    dqn = DQN(state_shape=tetris.state_shape, experience_size=100,
-            discount=0.95, epsilon=1, epsilon_min=0, epsilon_stop_episode=75)
-
-    collect_experiences(tetris, dqn)
-
-    train_model(tetris, dqn, batch_size=32,
-                epochs=3, episodes=20, train_every=5)
-
-    # print(read_from_file("scores"))
-    # print(read_from_file("movesPlayed"))
-
-
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
