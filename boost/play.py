@@ -136,11 +136,17 @@ def test_model(model, n_iter=1000, save_filename=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--filename", "-f", help="File to save the scores in", default="hmm_score.npy", type=str)
+    parser.add_argument("--model", "-m", help="Model to play ('hmm', or 'random')", default="hmm", type=str)
     parser.add_argument("--n", "-n", help="Number of hidden states", default=4, type=int)
     parser.add_argument("--n_iter", "-i", help="Number of games to play", default=1000, type=int)
     args = parser.parse_args()
 
-    test_model(hmm_model(args.n), n_iter=args.n_iter, save_filename=args.filename)
+    if args.model == "hmm":
+        model = hmm_model(args.n)
+    else:
+        model = random_model()
+
+    test_model(model, n_iter=args.n_iter, save_filename=args.filename)
 
 
 
