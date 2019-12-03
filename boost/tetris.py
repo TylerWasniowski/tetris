@@ -164,11 +164,11 @@ with mirrored_strategy.scope():
                 else:
                     new_q = reward
 
-                x.append(state)
-                y.append(new_q)
+                x.append(tf.convert_to_tensor(state))
+                y.append(tf.convert_to_tensor(new_q))
 
-            x = tf.convert_to_tensor(x)
-            y = tf.convert_to_tensor(y)
+            x = np.array(x)
+            y = np.array(y)
 
             self.model.fit(x, y, batch_size=batch_size,
                            epochs=epochs, verbose=0)
