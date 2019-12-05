@@ -1,4 +1,5 @@
 import argparse
+import cv2 as cv
 import math
 import numpy as np
 import random
@@ -7,19 +8,22 @@ from tqdm import tqdm
 
 import ai
 import observations
-# import tetris_boost
-import tetris_boost_5 as tetris_boost
+import tetris_boost
+import tetris_boost_5
 
 
 class Tetris:
-    def __init__(self):
+    def __init__(self, five_piece=False):
         self.score = 0
         self.move_columns = 4
         self.board_height = 20
         self.board_width = 10
         self.state_shape = (self.board_height, self.board_width)
         self.boardArray = np.zeros(self.state_shape, dtype=bool)
-        self.board = tetris_boost.Board()
+        if five_piece:
+            self.board = tetris_boost_5.Board()
+        else:
+            self.board = tetris_boost.Board()
         self.numberOfMoves = 0
         self.movesArray = np.zeros((0, 0), dtype=int)
         self.movesPlayed = 0
@@ -81,9 +85,9 @@ class Tetris:
 
 
 class Game:
-    def __init__(self, model):
+    def __init__(self, model, five_piece=False):
         self.model = model
-        self.tetris = Tetris()
+        self.tetris = Tetris(five_piece=five_piece)
 
     def play(self, n_moves=1, skip_render=False, sleep=1):
         for n in range(n_moves):
