@@ -8,8 +8,13 @@ HMM_FILE_NAME_BASE = "hmm_"
 HMM_FILE_NAME_EXTENSION = "_2c.hmm"
 
 
-def load_hmm(n=8):
-    file_name = __get_file_name(n)
+def load_hmm(n=8, compressed=True):
+    if compressed:
+        extension = "_2c.hmm"
+    else:
+        extension = "_2r.hmm"
+
+    file_name = __get_file_name(n, extension=extension)
     if not os.path.exists(file_name):
         return None
 
@@ -54,5 +59,5 @@ def train_hmm(observations, n=8, n_iter=350, restarts=1, verbose=False):
     return best_model
 
 
-def __get_file_name(n):
-    return HMM_FILE_NAME_BASE + str(n) + HMM_FILE_NAME_EXTENSION
+def __get_file_name(n, extension=HMM_FILE_NAME_EXTENSION):
+    return HMM_FILE_NAME_BASE + str(n) + extension
